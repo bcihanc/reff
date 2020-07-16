@@ -5,13 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   setupLocator();
-  const deviceID = "3f937f2c-a12e-41af-8cd6-3d3325419fa4";
+  const kdeviceID = "3f937f2c-a12e-41af-8cd6-3d3325419fa4";
 
   group("deviceID varsa", () {
     ReffSharedPreferences reffSharedPreferences;
     setUp(() {
-      SharedPreferences.setMockInitialValues({"device_id": deviceID});
-      reffSharedPreferences = getIt<ReffSharedPreferences>();
+      SharedPreferences.setMockInitialValues({"device_id": kdeviceID});
+      reffSharedPreferences = locator<ReffSharedPreferences>();
     });
     test("alınan değer, mock değere eşit olmalı", () async {
       final deviceID = await reffSharedPreferences.getDeviceID();
@@ -30,7 +30,7 @@ void main() async {
     ReffSharedPreferences reffSharedPreferences;
     setUp(() {
       SharedPreferences.setMockInitialValues({});
-      reffSharedPreferences = getIt<ReffSharedPreferences>();
+      reffSharedPreferences = locator<ReffSharedPreferences>();
     });
     test("getDeviceID yeni bir değer yaratmalı ve onu geriye döndürmeli",
         () async {
@@ -42,12 +42,18 @@ void main() async {
   group("diğer metodlar", () {
     ReffSharedPreferences reffSharedPreferences;
     setUp(() {
-      reffSharedPreferences = getIt<ReffSharedPreferences>();
+      reffSharedPreferences = locator<ReffSharedPreferences>();
     });
 
     test("getUniqeID asla null döndürmemeli", () {
       final deviceID = reffSharedPreferences.generateUniqueDeviceID();
       expect(deviceID, isNotNull);
+    });
+    test("tüm veriler temizlenmeli", () async {
+      SharedPreferences.setMockInitialValues({"device_id": kdeviceID});
+      await reffSharedPreferences.clear();
+      final length = (await SharedPreferences.getInstance()).getKeys().length;
+      expect(length, 0);
     });
   });
 }

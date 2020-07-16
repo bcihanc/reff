@@ -1,25 +1,27 @@
-import 'dart:io';
-
-import 'package:device_info/device_info.dart';
 import 'package:logging/logging.dart';
+import 'package:reff/core/providers/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class ReffSharedPreferences {
   final logger = Logger("ReffSharedPreferences");
   static const _kDEVICE_ID = "device_id";
+  static const _kAGE = "age";
+  static const _kLOCATION = "location";
+  static const _kGENDER = "gender";
 
   Future<String> getDeviceID() async {
     final prefs = await SharedPreferences.getInstance();
-    String deviceID;
+    String value;
     if (prefs.containsKey(_kDEVICE_ID)) {
-      deviceID = prefs.getString(_kDEVICE_ID);
+      value = prefs.getString(_kDEVICE_ID);
     } else {
-      await setDeviceID(await generateUniqueDeviceID());
+      await setDeviceID(generateUniqueDeviceID());
       await prefs.reload();
-      deviceID = prefs.getString(_kDEVICE_ID);
+      value = prefs.getString(_kDEVICE_ID);
     }
-    return deviceID;
+    logger.info("getDeviceUD : $value");
+    return value;
   }
 
   Future<void> setDeviceID(String value) async {
@@ -30,36 +32,67 @@ class ReffSharedPreferences {
     }
   }
 
-  Future<String> generateUniqueDeviceID() async {
-    String uniqueId;
-    final deviceInfo = DeviceInfoPlugin();
-    final uuid = Uuid().v4();
-
-    if (Platform.isAndroid) {
-      final info = await deviceInfo.androidInfo;
-      if (info != null && info.androidId != null) {
-        uniqueId = info.androidId;
-      } else {
-        uniqueId = uuid;
-      }
-    } else if (Platform.isIOS) {
-      final info = await deviceInfo.iosInfo;
-      if (info != null && info.identifierForVendor != null) {
-        uniqueId = info.identifierForVendor;
-      } else {
-        uniqueId = uuid;
-      }
-    } else {
-      uniqueId = uuid;
+  Future<void> setAge(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_kAGE)) {
+      await prefs.setInt(_kAGE, value);
+      logger.info("setAge : $value");
     }
-
-    logger.info("generateUniqueID : $uniqueId");
-    return uniqueId;
   }
 
-  Future<void> clear() async {
+  Future<int> getAge() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    if (!prefs.containsKey(_kAGE)) {
+      final value = prefs.getInt(_kAGE);
+      logger.info("getAge : $value");
+      return value;
+    } else {
+      return 0;
+    }
+  }
+
+  Future<void> setLocation(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_kLOCATION)) {
+      await prefs.setString(_kLOCATION, value);
+      logger.info("setLocation : $value");
+    }
+  }
+
+  Future<String> getLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_kLOCATION)) {
+      final value = prefs.getString(_kLOCATION);
+      logger.info("getLocation : $value");
+      return value;
+    } else {
+      return "NONE";
+    }
+  }
+
+  Future<void> setGender(Gender value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_kGENDER)) {
+      await prefs.setString(_kGENDER, value.toString());
+      logger.info("setGender : $value");
+    }
+  }
+
+  Future<Gender> getGender() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey(_kGENDER)) {
+      final value = prefs.getString(_kGENDER);
+      logger.info("getLocation : $value");
+      return value == "Gender.Male" ? Gender.MALE : Gender.FEMALE;
+    } else {
+      return Gender.NONE;
+    }
+  }
+
+  String generateUniqueDeviceID() => Uuid().v4();
+
+  Future<void> clear() async {
+    (await SharedPreferences.getInstance()).clear();
     logger.info("clear shared preferences");
   }
 }

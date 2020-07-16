@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:reff/core/services/reff_shared_preferences.dart';
-import 'package:reff/core/utils/locator.dart';
+import 'package:provider/provider.dart';
+import 'package:reff/core/providers/user_provider.dart';
 
 class DebugScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final reffSP = getIt<ReffSharedPreferences>();
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        FutureBuilder<String>(
-          initialData: "null",
-          future: reffSP.getDeviceID(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Text("Device ID : ${snapshot.data}");
-            }
-            return CircularProgressIndicator();
-          },
-        )
-      ],
+    final user = Provider.of<UserProvider>(context);
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text("Device ID : ${user.model.deviceID?.substring(0, 6)}"),
+          Text("Age : ${user.model.age}"),
+          Text("Gender : ${user.model.gender}"),
+          Text("Age : ${user.model.location}"),
+        ],
+      ),
     );
   }
 }
