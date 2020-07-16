@@ -10,11 +10,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pedantic: ^1.9.2
+  logging: ^0.11.4
+  shared_preferences: ^0.5.8
+  get_it: ^4.0.2
+  provider: ^4.3.1
+  mockito: ^4.1.1
+  easy_localization: ^2.3.2
+  google_fonts: ^1.1.0
+  device_info: ^0.4.2+4
+  uuid: ^2.2.0
+
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
+
+
 flutter:
   uses-material-design: true
+  assets:
+    - assets/translations/
