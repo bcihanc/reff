@@ -1,5 +1,5 @@
 import 'package:logging/logging.dart';
-import 'package:reff/core/providers/user_provider.dart';
+import 'package:reff/core/models/UserModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 

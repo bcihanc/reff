@@ -2,10 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reff/core/models/UserModel.dart';
 import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/core/utils/locator.dart';
 import 'package:reff/core/utils/logger.dart';
-import 'package:reff/screens/debug_screen.dart';
+import 'package:reff/views/screens/debug_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,11 +16,11 @@ void main() async {
   final model = await () async {
     print("started");
     await Future.delayed(Duration(seconds: 1));
-    return UserModel()
-      ..deviceID = "123458"
-      ..age = 32
-      ..location = "İstanbul"
-      ..gender = Gender.FEMALE;
+    return UserModel(
+        deviceID: "123458",
+        age: 32,
+        location: "İstanbul",
+        gender: Gender.FEMALE);
   }();
 
   runApp(EasyLocalization(
