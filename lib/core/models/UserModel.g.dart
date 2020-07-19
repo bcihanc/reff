@@ -6,18 +6,18 @@ part of 'UserModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UserModel _$UserModelFromJson(Map<String, dynamic> json) {
-  return UserModel(
-    deviceID: json['deviceID'] as String,
+_$_UserModel _$_$_UserModelFromJson(Map<String, dynamic> json) {
+  return _$_UserModel(
+    id: json['id'] as String,
     age: json['age'] as int,
     gender: _$enumDecodeNullable(_$GenderEnumMap, json['gender']),
     location: json['location'] as String,
-  )..id = json['id'] as String;
+  );
 }
 
-Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
+Map<String, dynamic> _$_$_UserModelToJson(_$_UserModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
-      'deviceID': instance.deviceID,
       'age': instance.age,
       'gender': _$GenderEnumMap[instance.gender],
       'location': instance.location,
@@ -58,5 +58,4 @@ T _$enumDecodeNullable<T>(
 const _$GenderEnumMap = {
   Gender.MALE: 'MALE',
   Gender.FEMALE: 'FEMALE',
-  Gender.NONE: 'NONE',
 };

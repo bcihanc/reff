@@ -10,10 +10,10 @@ class DebugScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("Device ID : ${user.model.deviceID?.substring(0, 6)}"),
-          Text("Age : ${user.model.age}"),
-          Text("Gender : ${user.model.gender}"),
-          Text("Age : ${user.model.location}"),
+          Text("Device ID : ${user.model?.id?.substring(0, 6)}"),
+          Text("Age : ${user.model?.age}"),
+          Text("Gender : ${user.model?.gender}"),
+          Text("Age : ${user.model?.location}"),
         ],
       ),
     );

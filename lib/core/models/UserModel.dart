@@ -1,20 +1,20 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'UserModel.freezed.dart';
 part 'UserModel.g.dart';
 
-@JsonSerializable()
-class UserModel {
-  String id;
-  final String deviceID;
-  final int age;
-  final Gender gender;
-  final String location;
-
-  UserModel({this.deviceID, this.age, this.gender, this.location});
+@freezed
+abstract class UserModel with _$UserModel {
+  factory UserModel({
+    @nullable String id,
+    @required int age,
+    @required Gender gender,
+    @required String location,
+  }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
-  Map<String, dynamic> toJson() => _$UserModelToJson(this);
 }
 
-enum Gender { MALE, FEMALE, NONE }
+enum Gender { MALE, FEMALE }

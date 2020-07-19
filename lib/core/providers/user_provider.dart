@@ -1,22 +1,18 @@
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:reff/core/models/UserModel.dart';
-import 'package:reff/core/services/reff_shared_preferences.dart';
-import 'package:reff/core/utils/locator.dart';
+import 'package:reff/core/services/mock_api.dart';
 
 class UserProvider with ChangeNotifier {
-  ReffSharedPreferences reffPrefs;
+  final _logger = Logger("UserProvider");
+  final ApiBase api;
   UserModel model;
 
-  UserProvider({@required UserModel model}) : assert(model != null) {
-    reffPrefs = locator<ReffSharedPreferences>();
-    this.model = model ?? UserModel();
-  }
+  UserProvider({this.model, this.api});
 
-//  Future<void> loadData() async {
-//    this.model.deviceID = await reffPrefs.getDeviceID();
-//    this.model.age = 29 ?? 0;
-//    this.model.location = "Antalya" ?? "NONE";
-//    this.model.gender = Gender.MALE ?? Gender.NONE;
-//    notifyListeners();
-//  }
+  Future<void> reload(String id) async {
+    this.model = await api.getUserByID(id);
+    notifyListeners();
+    _logger.info("fetch complete");
+  }
 }

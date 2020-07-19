@@ -1,17 +1,17 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'VoteModel.freezed.dart';
 part 'VoteModel.g.dart';
 
-@JsonSerializable()
-class VoteModel {
-  String id;
-  final String userId;
-  final String questionId;
-  final String answerId;
-
-  VoteModel({this.userId, this.questionId, this.answerId});
+@freezed
+abstract class VoteModel with _$VoteModel {
+  factory VoteModel({
+    @nullable String id,
+    @required String userID,
+    @required String questionID,
+    @required String answerID,
+  }) = _AnswerModel;
 
   factory VoteModel.fromJson(Map<String, dynamic> json) =>
       _$VoteModelFromJson(json);
-  Map<String, dynamic> toJson() => _$VoteModelToJson(this);
 }

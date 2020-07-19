@@ -6,17 +6,19 @@ part of 'VoteModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-VoteModel _$VoteModelFromJson(Map<String, dynamic> json) {
-  return VoteModel(
-    userId: json['userId'] as String,
-    questionId: json['questionId'] as String,
-    answerId: json['answerId'] as String,
-  )..id = json['id'] as String;
+_$_AnswerModel _$_$_AnswerModelFromJson(Map<String, dynamic> json) {
+  return _$_AnswerModel(
+    id: json['id'] as String,
+    userID: json['userID'] as String,
+    questionID: json['questionID'] as String,
+    answerID: json['answerID'] as String,
+  );
 }
 
-Map<String, dynamic> _$VoteModelToJson(VoteModel instance) => <String, dynamic>{
+Map<String, dynamic> _$_$_AnswerModelToJson(_$_AnswerModel instance) =>
+    <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
-      'questionId': instance.questionId,
-      'answerId': instance.answerId,
+      'userID': instance.userID,
+      'questionID': instance.questionID,
+      'answerID': instance.answerID,
     };
