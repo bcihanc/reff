@@ -6,21 +6,21 @@ import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/core/services/mock_api.dart';
 import 'package:reff/core/utils/locator.dart';
 import 'package:reff/core/utils/logger.dart';
-import 'package:reff/core/utils/mock_data.dart' as mock;
 import 'package:reff/views/screens/debug_screen.dart';
+import 'package:reff_shared/core/models/models.dart';
+import 'package:reff_shared/core/utils/utils.dart' as mock;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   logger();
   await setupLocator();
 
-  final userID = await () async {
-    await Future.delayed(Duration(seconds: 1));
-    return mock.userCollectionMock.first["id"];
-  }();
-
   final api = locator<MockApi>();
-  final user = await api.getUserByID(userID);
+  final user = await () async {
+    await Future.delayed(Duration(seconds: 1));
+    return UserModel(
+        id: mock.kuserID1, age: 29, gender: Gender.MALE, location: "antalya");
+  }();
 
   runApp(EasyLocalization(
       child: MultiProvider(providers: [

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:reff/core/models/UserModel.dart';
-import 'package:reff/core/utils/mock_data.dart' as mock;
+import 'package:reff_shared/core/models/models.dart';
+import 'package:reff_shared/core/utils/utils.dart' as mock;
 
 main() async {
   group("user model tests", () {

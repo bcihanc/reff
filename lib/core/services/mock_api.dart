@@ -1,18 +1,7 @@
 import 'package:cloud_firestore_mocks/cloud_firestore_mocks.dart';
-import 'package:reff/core/models/AnswerModel.dart';
-import 'package:reff/core/models/QuestionModel.dart';
-import 'package:reff/core/models/UserModel.dart';
-import 'package:reff/core/models/VoteModel.dart';
-import 'package:reff/core/utils/mock_data.dart' as mock;
-
-abstract class ApiBase {
-  Future<UserModel> getUserByID(String userID);
-  Future<List<QuestionModel>> getQuestionsByUserID(String userID);
-  Future<List<AnswerModel>> getAnswersByQuestionID(String questionID);
-
-  Future<void> addVote(VoteModel model);
-  Future<bool> didVotedByUserID(String userID, String questionID);
-}
+import 'package:reff_shared/core/utils/utils.dart' as mock;
+import 'package:reff_shared/core/models/models.dart';
+import 'package:reff_shared/core/services/services.dart';
 
 class MockApi implements ApiBase {
   MockFirestoreInstance firestore;
@@ -52,8 +41,29 @@ class MockApi implements ApiBase {
     return model;
   }
 
+  Future<List<QuestionModel>> getQuestionsForToday() async {
+    final snapshot =
+        await firestore.collection(kCollectionQuestions).getDocuments();
+    final questions =
+        snapshot.documents.map((e) => QuestionModel.fromJson(e.data)).toList();
+    return questions;
+  }
+
   Future<List<QuestionModel>> getQuestionsByUserID(String userID) async {
-    throw UnimplementedError();
+    final questions = await getQuestionsForToday();
+
+    if (questions.isNotEmpty) {
+      var available = <QuestionModel>[];
+      for (final question in questions) {
+        final isVoted = await isVotedByUserAndQuestionID(userID, question.id);
+        if (!isVoted) {
+          available.add(question);
+        }
+      }
+      return available;
+    } else {
+      return null;
+    }
   }
 
   @override
@@ -67,13 +77,13 @@ class MockApi implements ApiBase {
     final question = QuestionModel.fromJson(snapshot.data);
     final answersIDs = question.answers;
     final answers = answersIDs.map((e) async {
-      return await getAnswerByAnswerID(e);
+      return await getAnswerByID(e);
     }).toList();
 
     return await Future.wait(answers);
   }
 
-  Future<AnswerModel> getAnswerByAnswerID(String answerID) async {
+  Future<AnswerModel> getAnswerByID(String answerID) async {
     assert(answerID != null);
     final snapshot =
         await firestore.collection(kCollectionAnswers).document(answerID).get();
@@ -87,10 +97,18 @@ class MockApi implements ApiBase {
   }
 
   @override
-  Future<bool> didVotedByUserID(String userID, String questionID) async {
-    var vote = mock.voteCollectionMock?.firstWhere(
-        (vote) => vote["userID"] == userID && vote["questionID"] == questionID);
+  Future<bool> isVotedByUserAndQuestionID(
+      String userID, String questionID) async {
+    assert(userID != null);
+    assert(questionID != null);
 
-    return vote != null ? true : false;
+    final query = await firestore
+        .collection(kCollectionVotes)
+        .where("userID", isEqualTo: userID)
+        .where("questionID", isEqualTo: questionID)
+        .getDocuments();
+
+    final isVoted = query.documents.isNotEmpty;
+    return isVoted;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:reff/core/models/QuestionModel.dart';
-import 'package:reff/core/services/mock_api.dart';
+import 'package:reff_shared/core/models/models.dart';
+import 'package:reff_shared/core/services/services.dart';
 
 class QuestionProvider with ChangeNotifier {
   final _logger = Logger("QuestionProvider");
@@ -9,8 +9,12 @@ class QuestionProvider with ChangeNotifier {
   List<QuestionModel> models;
 
   QuestionProvider({this.models, this.api});
+}
 
-  Future<void> initialize(String id) async {
-    this.models = await api.getQuestionsByUserID(id);
-  }
+class AnswerProvider with ChangeNotifier {
+  final _logger = Logger("AnswerProvider");
+  final ApiBase api;
+  List<AnswerProvider> models;
+
+  AnswerProvider({this.models, this.api});
 }

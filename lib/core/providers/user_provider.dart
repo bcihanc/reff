@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:reff/core/models/UserModel.dart';
-import 'package:reff/core/services/mock_api.dart';
+import 'package:reff_shared/core/models/models.dart';
+import 'package:reff_shared/core/services/services.dart';
 
 class UserProvider with ChangeNotifier {
   final _logger = Logger("UserProvider");
