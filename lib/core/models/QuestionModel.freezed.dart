@@ -142,7 +142,7 @@ class __$QuestionModelCopyWithImpl<$Res>
 
 @JsonSerializable()
 class _$_QuestionModel implements _QuestionModel {
-  _$_QuestionModel(
+  const _$_QuestionModel(
       {@nullable this.id,
       @required this.header,
       @nullable this.content,
@@ -218,7 +218,7 @@ class _$_QuestionModel implements _QuestionModel {
 }
 
 abstract class _QuestionModel implements QuestionModel {
-  factory _QuestionModel(
+  const factory _QuestionModel(
       {@nullable String id,
       @required String header,
       @nullable String content,

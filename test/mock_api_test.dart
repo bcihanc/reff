@@ -12,12 +12,11 @@ main() async {
 
   group("mock", () {
     ReffSharedPreferences reffSharedPreferences;
-//    ApiBase api;
-    MockApi api;
+    ApiBase api;
     String userID;
 
     setUpAll(() async {
-      SharedPreferences.setMockInitialValues({"userID": mock.kuserID});
+      SharedPreferences.setMockInitialValues({"userID": mock.kuserID1});
       reffSharedPreferences = locator<ReffSharedPreferences>();
       api = locator<MockApi>();
       userID = await reffSharedPreferences.getUserID();
@@ -33,12 +32,28 @@ main() async {
       expect(user.toJson(), userFromMock);
     });
 
-    test("answers", () async {
+    test("is answers is answer", () async {
       final questionID = mock.questionCollectionMock.first["id"];
       final answers = await api.getAnswersByQuestionID(questionID);
       answers.forEach((answer) {
         expect(true, answer is AnswerModel);
       });
+    });
+
+    test("user daha önce oy kullandıysa true", () async {
+      final userID = mock.userCollectionMock.first["id"];
+      final questionID = mock.questionCollectionMock.first["id"];
+
+      final isVoted = await api.isVotedByUserAndQuestionID(userID, questionID);
+      expect(isVoted, true);
+    });
+
+    test("user daha önce oy kullanmadıysa false", () async {
+      final userID = mock.userCollectionMock[1]["id"];
+      final questionID = mock.questionCollectionMock.first["id"];
+
+      final isVoted = await api.isVotedByUserAndQuestionID(userID, questionID);
+      expect(isVoted, false);
     });
   });
 }

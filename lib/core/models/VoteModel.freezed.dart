@@ -112,7 +112,7 @@ class __$AnswerModelCopyWithImpl<$Res> extends _$VoteModelCopyWithImpl<$Res>
 
 @JsonSerializable()
 class _$_AnswerModel implements _AnswerModel {
-  _$_AnswerModel(
+  const _$_AnswerModel(
       {@nullable this.id,
       @required this.userID,
       @required this.questionID,
@@ -174,7 +174,7 @@ class _$_AnswerModel implements _AnswerModel {
 }
 
 abstract class _AnswerModel implements VoteModel {
-  factory _AnswerModel(
+  const factory _AnswerModel(
       {@nullable String id,
       @required String userID,
       @required String questionID,

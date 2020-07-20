@@ -5,7 +5,7 @@ part 'QuestionModel.g.dart';
 
 @freezed
 abstract class QuestionModel with _$QuestionModel {
-  factory QuestionModel({
+  const factory QuestionModel({
     @nullable String id,
     @required String header,
     @nullable String content,

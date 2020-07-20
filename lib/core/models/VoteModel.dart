@@ -5,7 +5,7 @@ part 'VoteModel.g.dart';
 
 @freezed
 abstract class VoteModel with _$VoteModel {
-  factory VoteModel({
+  const factory VoteModel({
     @nullable String id,
     @required String userID,
     @required String questionID,

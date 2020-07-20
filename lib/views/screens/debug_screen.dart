@@ -6,6 +6,7 @@ class DebugScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context);
+
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

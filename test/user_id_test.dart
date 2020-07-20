@@ -11,7 +11,7 @@ void main() async {
     ReffSharedPreferences reffSharedPreferences;
     setUpAll(() {
       SharedPreferences.setMockInitialValues(
-          {ReffSharedPreferences.kuserIDKey: kuserID});
+          {ReffSharedPreferences.kuserIDKey: kuserID1});
       reffSharedPreferences = locator<ReffSharedPreferences>();
     });
 
@@ -29,7 +29,7 @@ void main() async {
 
     test("tüm veriler temizlenmeli", () async {
       SharedPreferences.setMockInitialValues(
-          {ReffSharedPreferences.kuserIDKey: kuserID});
+          {ReffSharedPreferences.kuserIDKey: kuserID1});
       await reffSharedPreferences.clear();
       final length = (await SharedPreferences.getInstance()).getKeys().length;
       expect(length, 0);

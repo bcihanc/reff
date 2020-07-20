@@ -104,7 +104,7 @@ class __$AnswerModelCopyWithImpl<$Res> extends _$AnswerModelCopyWithImpl<$Res>
 
 @JsonSerializable()
 class _$_AnswerModel implements _AnswerModel {
-  _$_AnswerModel(
+  const _$_AnswerModel(
       {@nullable this.id, @required this.content, @nullable this.imageUrl})
       : assert(content != null);
 
@@ -157,7 +157,7 @@ class _$_AnswerModel implements _AnswerModel {
 }
 
 abstract class _AnswerModel implements AnswerModel {
-  factory _AnswerModel(
+  const factory _AnswerModel(
       {@nullable String id,
       @required String content,
       @nullable String imageUrl}) = _$_AnswerModel;

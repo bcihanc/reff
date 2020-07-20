@@ -107,7 +107,7 @@ class __$UserModelCopyWithImpl<$Res> extends _$UserModelCopyWithImpl<$Res>
 
 @JsonSerializable()
 class _$_UserModel with DiagnosticableTreeMixin implements _UserModel {
-  _$_UserModel(
+  const _$_UserModel(
       {@nullable this.id,
       @required this.age,
       @required this.gender,
@@ -179,7 +179,7 @@ class _$_UserModel with DiagnosticableTreeMixin implements _UserModel {
 }
 
 abstract class _UserModel implements UserModel {
-  factory _UserModel(
+  const factory _UserModel(
       {@nullable String id,
       @required int age,
       @required Gender gender,

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:reff/core/models/UserModel.dart';
 import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/core/services/mock_api.dart';
 import 'package:reff/core/utils/locator.dart';
@@ -20,7 +21,11 @@ void main() async {
   }();
 
   final api = locator<MockApi>();
-  final user = await api.getUserByID(userID);
+  final user = await () async {
+    await Future.delayed(Duration(seconds: 1));
+    return UserModel(
+        id: mock.kuserID1, age: 29, gender: Gender.MALE, location: "antalya");
+  }();
 
   runApp(EasyLocalization(
       child: MultiProvider(providers: [

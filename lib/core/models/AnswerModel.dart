@@ -6,7 +6,7 @@ part 'AnswerModel.g.dart';
 
 @freezed
 abstract class AnswerModel with _$AnswerModel {
-  factory AnswerModel({
+  const factory AnswerModel({
     @nullable String id,
     @required String content,
     @nullable String imageUrl,

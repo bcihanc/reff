@@ -9,8 +9,12 @@ class QuestionProvider with ChangeNotifier {
   List<QuestionModel> models;
 
   QuestionProvider({this.models, this.api});
+}
 
-  Future<void> initialize(String id) async {
-    this.models = await api.getQuestionsByUserID(id);
-  }
+class AnswerProvider with ChangeNotifier {
+  final _logger = Logger("AnswerProvider");
+  final ApiBase api;
+  List<AnswerProvider> models;
+
+  AnswerProvider({this.models, this.api});
 }
