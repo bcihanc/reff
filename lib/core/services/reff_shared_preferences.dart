@@ -2,35 +2,31 @@ import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReffSharedPreferences {
-  final logger = Logger("ReffSharedPreferences");
-  static const kuserIDKey = "userID";
+  final _logger = Logger("ReffSharedPreferences");
+  static const userIDKey = "userID";
 
-  Future<bool> isUserExist() async {
-    final prefs = await SharedPreferences.getInstance();
-    final exist = prefs.containsKey(kuserIDKey);
-    logger.info("isUserExist : $exist");
+  Future<bool> isRegistered() async {
+    final exist =
+        (await SharedPreferences.getInstance()).containsKey(userIDKey);
+    _logger.info("registered : $exist");
     return exist;
   }
 
   Future<String> getUserID() async {
-    final prefs = await SharedPreferences.getInstance();
-    String value = prefs.getString(kuserIDKey);
-    logger.info("getDeviceUD : $value");
+    final value = (await SharedPreferences.getInstance()).getString(userIDKey);
+    _logger.info("getUserUD : $value");
     return value;
   }
 
-//  Future<void> setUserID(String value) async {
-//    final prefs = await SharedPreferences.getInstance();
-//    if (!prefs.containsKey(_kuserID)) {
-//      await prefs.setString(_kuserID, value);
-//      logger.info("setDeviceID : $value");
-//    }
-//  }
-
-//  String generateUniqueDeviceID() => Uuid().v4();
+  Future<bool> setUserID(String value) async {
+    final result = await (await SharedPreferences.getInstance())
+        .setString(userIDKey, value);
+    _logger.info("setUserID : $value");
+    return result;
+  }
 
   Future<void> clear() async {
     (await SharedPreferences.getInstance()).clear();
-    logger.info("clear shared preferences");
+    _logger.info("clear shared preferences");
   }
 }

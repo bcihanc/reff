@@ -1,38 +1,34 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import 'package:reff/core/providers/user_provider.dart';
-import 'package:reff/core/services/mock_api.dart';
+import 'package:reff/core/services/reff_shared_preferences.dart';
 import 'package:reff/core/utils/locator.dart';
 import 'package:reff/core/utils/logger.dart';
-import 'package:reff/views/screens/debug_screen.dart';
-import 'package:reff_shared/core/models/models.dart';
-import 'package:reff_shared/core/utils/utils.dart' as mock;
+import 'package:reff/views/screens/splash_screen.dart';
+import 'package:reff_shared/core/services/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  logger();
+  setupLogger();
   await setupLocator();
 
-  final api = locator<MockApi>();
-  final user = await () async {
-    await Future.delayed(Duration(seconds: 1));
-    return UserModel(
-        id: mock.kuserID1, age: 29, gender: Gender.MALE, location: "antalya");
-  }();
+  final api = locator<BaseApi>();
+//  await locator<ReffSharedPreferences>().setUserID("TdmoTWNiclrKmOFD6zAC");
+
+  await locator<ReffSharedPreferences>().clear();
+  final isRegistered = await locator<ReffSharedPreferences>().isRegistered();
 
   runApp(EasyLocalization(
-      child: MultiProvider(providers: [
-        ChangeNotifierProvider<UserProvider>(
-            create: (context) =>
-                locator<UserProvider>(param1: user, param2: api)),
-      ], child: MyApp()),
+      child: MyApp(isRegistered: isRegistered),
       supportedLocales: [Locale("tr")],
       path: "assets/translations"));
 }
 
 class MyApp extends StatelessWidget {
+  final bool isRegistered;
+
+  const MyApp({Key key, this.isRegistered}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -52,7 +48,9 @@ class MyApp extends StatelessWidget {
             tr("title"),
             style: GoogleFonts.pacifico(),
           )),
-          body: DebugScreen()),
+          body: SplashScreen(
+            isRegistered: isRegistered,
+          )),
     );
   }
 }

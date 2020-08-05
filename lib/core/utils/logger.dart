@@ -1,6 +1,6 @@
 import 'package:logging/logging.dart';
 
-void logger() {
+void setupLogger() {
   Logger.root.level = Level.ALL;
   hierarchicalLoggingEnabled = true;
   Logger.root.onRecord.listen((record) =>

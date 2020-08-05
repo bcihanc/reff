@@ -5,7 +5,7 @@ import 'package:reff_shared/core/services/services.dart';
 
 class QuestionProvider with ChangeNotifier {
   final _logger = Logger("QuestionProvider");
-  final ApiBase api;
+  final BaseApi api;
   List<QuestionModel> models;
 
   QuestionProvider({this.models, this.api});
@@ -13,7 +13,7 @@ class QuestionProvider with ChangeNotifier {
 
 class AnswerProvider with ChangeNotifier {
   final _logger = Logger("AnswerProvider");
-  final ApiBase api;
+  final BaseApi api;
   List<AnswerProvider> models;
 
   AnswerProvider({this.models, this.api});
