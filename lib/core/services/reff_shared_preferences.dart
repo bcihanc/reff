@@ -4,29 +4,40 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ReffSharedPreferences {
   final _logger = Logger("ReffSharedPreferences");
   static const userIDKey = "userID";
+  static const userIDValue = "TdmoTWNiclrKmOFD6zAC";
 
-  Future<bool> isRegistered() async {
-    final exist =
-        (await SharedPreferences.getInstance()).containsKey(userIDKey);
-    _logger.info("registered : $exist");
-    return exist;
-  }
+  Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
   Future<String> getUserID() async {
-    final value = (await SharedPreferences.getInstance()).getString(userIDKey);
-    _logger.info("getUserUD : $value");
-    return value;
+    final isContains = (await _prefs).containsKey(userIDKey);
+
+    if (isContains) {
+      final value =
+          (await SharedPreferences.getInstance()).getString(userIDKey);
+      _logger.info("getUserUD : $value");
+      return value;
+    } else {
+      _logger.shout("getUserUD : is null");
+      return null;
+    }
   }
 
   Future<bool> setUserID(String value) async {
-    final result = await (await SharedPreferences.getInstance())
-        .setString(userIDKey, value);
-    _logger.info("setUserID : $value");
+    final result = await (await _prefs).setString(userIDKey, value);
+
+    result
+        ? _logger.info("setUserID : kaydedildi : $value")
+        : _logger.shout("setUserID : kaydedilemedi");
+
     return result;
   }
 
-  Future<void> clear() async {
-    (await SharedPreferences.getInstance()).clear();
-    _logger.info("clear shared preferences");
+  Future<bool> clear() async {
+    final result = await (await _prefs).clear();
+
+    result
+        ? _logger.info("prefs temizlendi")
+        : _logger.shout("prefs temizlenemedi");
+    return result;
   }
 }

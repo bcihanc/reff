@@ -1,27 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/views/screens/gender_selector.dart';
+import 'package:reff_shared/core/models/CityModel.dart';
+import 'package:reff_shared/core/models/models.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends HookWidget {
   final _logger = Logger("RegisterScreen");
-
-  RegisterScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     _logger.info("build");
+    final userProvider = useProvider(userStateProvider);
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await userProvider.create();
+        },
+        child: Icon(Icons.navigate_next),
+      ),
       body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            GenderSelector(),
+            GenderSelector(
+              onChanged: (Gender gender) {
+                userProvider.setGender(gender);
+              },
+            ),
             Divider(),
-            AgePicker(),
-            LocationPicker()
+            AgePicker(
+              onChanged: (int age) {
+                userProvider.setAge(age);
+              },
+            ),
+            Divider(),
+            LocationPicker(
+              onChanged: (CityModel city) {
+                userProvider.setLocation(city);
+              },
+            )
           ],
         ),
       ),
@@ -29,53 +52,51 @@ class RegisterScreen extends StatelessWidget {
   }
 }
 
-class LocationPicker extends StatefulWidget {
-  @override
-  _LocationPickerState createState() => _LocationPickerState();
-}
-
-class _LocationPickerState extends State<LocationPicker> {
-  TurkeyCities city;
+class LocationPicker extends HookWidget {
+  LocationPicker({this.onChanged});
+  final ValueChanged<CityModel> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return SearchableDropdown.single(
-      icon: Icon(Icons.map),
-      value: city,
-      items: [
-        DropdownMenuItem(
-          child: Text('Antalya'),
-          value: TurkeyCities.ANTALYA,
-        ),
-        DropdownMenuItem(child: Text('İstanbul'), value: TurkeyCities.ISTANBUL),
-      ],
-      onChanged: (value) {
-        setState(() {
-          this.city = value;
-        });
-      },
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        children: [
+          SearchableDropdown.single(
+            value: CityModel.initialize,
+            items: CityModel.TURKEY
+                .map((city) => DropdownMenuItem(
+                      child: Text(city.name),
+                      value: city,
+                    ))
+                .toList(),
+            onChanged: (value) {
+              onChanged(value);
+            },
+          ),
+          Divider(color: Colors.transparent),
+          Text('yaşıyorum')
+        ],
+      ),
     );
   }
 }
 
-enum TurkeyCities { ISTANBUL, ANTALYA }
+class AgePicker extends HookWidget {
+  final ValueChanged<int> onChanged;
 
-class AgePicker extends StatefulWidget {
-  @override
-  _AgePickerState createState() => _AgePickerState();
-}
+  AgePicker({this.onChanged});
 
-class _AgePickerState extends State<AgePicker> {
-  int _selectedValue = 32;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 70,
-      child: Theme(
-        data: ThemeData.dark().copyWith(accentColor: Colors.grey),
-        child: Builder(
-            builder: (context) => NumberPicker.horizontal(
-                initialValue: _selectedValue,
+    final _selectedValueState = useState(32);
+
+    return Column(
+      children: [
+        Container(
+            height: 70,
+            child: NumberPicker.horizontal(
+                initialValue: _selectedValueState.value,
                 haptics: true,
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -84,11 +105,12 @@ class _AgePickerState extends State<AgePicker> {
                 minValue: 18,
                 maxValue: 98,
                 onChanged: (value) {
-                  setState(() {
-                    _selectedValue = value;
-                  });
+                  _selectedValueState.value = value;
+                  onChanged(value.toInt());
                 })),
-      ),
+        Divider(color: Colors.transparent),
+        Text('yaşındayım'),
+      ],
     );
   }
 }

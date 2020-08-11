@@ -1,37 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:reff_shared/core/models/models.dart';
+import 'package:reff_shared/core/utils/constants.dart';
 
-class GenderSelector extends StatefulWidget {
+class GenderSelector extends StatefulHookWidget {
+  final ValueChanged<Gender> onChanged;
+
+  GenderSelector({this.onChanged});
+
   @override
   _GenderSelectorState createState() => _GenderSelectorState();
 }
 
 class _GenderSelectorState extends State<GenderSelector> {
-  final genders = [
-    GenderWidgetModel("Male", MdiIcons.genderMale, false),
-    GenderWidgetModel("Female", MdiIcons.genderFemale, false),
-    GenderWidgetModel("Others", MdiIcons.genderTransgender, false)
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final gendersState = useState([
+      GenderWidgetModel(
+          name: "Erkek",
+          icon: MdiIcons.genderMale,
+          isSelected: true,
+          gender: Gender.MALE),
+      GenderWidgetModel(
+          name: "Kadın",
+          icon: MdiIcons.genderFemale,
+          isSelected: false,
+          gender: Gender.FEMALE),
+      GenderWidgetModel(
+          name: "Diğer",
+          icon: MdiIcons.genderTransgender,
+          isSelected: false,
+          gender: Gender.OTHERS)
+    ]);
+
     return Container(
       alignment: Alignment.center,
       height: 100,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
-          itemCount: genders.length,
+          itemCount: gendersState.value.length,
           itemBuilder: (context, index) {
             return InkWell(
-              splashColor: Colors.pinkAccent,
+              key: KeysForTesting.gendersKey[index],
+              splashColor: Theme.of(context).accentColor,
               onTap: () {
-                setState(() {
-                  genders.forEach((gender) => gender.isSelected = false);
-                  genders[index].isSelected = true;
-                });
+                gendersState.value
+                    .forEach((gender) => gender.isSelected = false);
+                gendersState.value[index].isSelected = true;
+                setState(() {});
+                widget.onChanged(gendersState.value[index].gender);
               },
-              child: CustomRadio(gender: genders[index]),
+              child: CustomRadio(gender: gendersState.value[index]),
             );
           }),
     );
@@ -46,12 +67,14 @@ class CustomRadio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-        color: gender.isSelected ? Color(0xFF3B4257) : Colors.white,
+        color: gender.isSelected
+            ? Theme.of(context).accentColor.withOpacity(0.5)
+            : Colors.transparent,
         child: Container(
           height: 80,
           width: 80,
           alignment: Alignment.center,
-          margin: new EdgeInsets.all(5.0),
+          margin: EdgeInsets.all(5.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,6 +100,7 @@ class GenderWidgetModel {
   String name;
   IconData icon;
   bool isSelected;
+  Gender gender;
 
-  GenderWidgetModel(this.name, this.icon, this.isSelected);
+  GenderWidgetModel({this.name, this.icon, this.isSelected, this.gender});
 }
