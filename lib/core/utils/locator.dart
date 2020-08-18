@@ -8,7 +8,7 @@ final locator = GetIt.instance;
 Future<void> setupLocator() async {
   locator.registerSingleton<ReffSharedPreferences>(ReffSharedPreferences());
 
-  locator.registerLazySingleton<BaseQuestionApi>(() => QuestionFirestoreApi());
+  locator.registerSingleton<BaseQuestionApi>(QuestionFirestoreApi());
   locator.registerLazySingleton<BaseAnswerApi>(() => AnswerFirestoreApi());
   locator.registerLazySingleton<BaseUserApi>(() => UserFirebaseApi());
   locator.registerLazySingleton<BaseVoteApi>(() => VoteFirebaseApi());

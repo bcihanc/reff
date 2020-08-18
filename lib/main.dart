@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +21,9 @@ void main() async {
   setupLogger();
   await setupLocator();
 
-  await forDebug();
+  if (kDebugMode) {
+//    await forDebug();
+  }
 
   runApp(ProviderScope(
     child: EasyLocalization(

@@ -1,4 +1,5 @@
 import 'package:logging/logging.dart';
+import 'package:reff_shared/core/utils/log_messages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReffSharedPreferences {
@@ -26,8 +27,8 @@ class ReffSharedPreferences {
     final result = await (await _prefs).setString(userIDKey, value);
 
     result
-        ? _logger.info("setUserID : kaydedildi : $value")
-        : _logger.shout("setUserID : kaydedilemedi");
+        ? _logger.info(LogMessages.created(value))
+        : _logger.shout(LogMessages.notCreated);
 
     return result;
   }

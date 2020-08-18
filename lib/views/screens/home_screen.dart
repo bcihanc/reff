@@ -3,10 +3,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:reff/core/providers/user_provider.dart';
+import 'package:reff/views/widgets/question_card.dart';
 import 'package:reff_shared/core/models/models.dart';
 
 class HomeScreen extends HookWidget {
-  final _logger = Logger("SplashScreen");
+  final _logger = Logger("HomeScreen");
   final UserModel user;
 
   HomeScreen({Key key, this.user})
@@ -15,13 +16,15 @@ class HomeScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    _logger.info("build");
+
     final userProvider = useProvider(userStateProvider);
 
     useMemoized(() async {
       userProvider.initialize(user);
     });
 
-    _logger.info("build");
+    return QuestionCard();
     return Center(
         child: Column(
       children: [
