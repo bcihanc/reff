@@ -6,7 +6,7 @@ import 'package:reff/core/providers/user_provider.dart';
 class DebugScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final userProvider = useProvider(userStateProvider.state);
+    final userProvider = useProvider(UserState.provider.state);
 
     return Center(
       child: Column(

@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:reff/core/services/firebase_api.dart';
 import 'package:reff/core/services/reff_shared_preferences.dart';
 import 'package:reff_shared/core/services/services.dart';
 

@@ -91,7 +91,7 @@ packages:
       name: connectivity
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.9"
+    version: "0.4.9+2"
   connectivity_for_web:
     dependency: transitive
     description:
@@ -187,7 +187,7 @@ packages:
       name: flutter_hooks
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.13.1"
+    version: "0.13.2"
   flutter_localizations:
     dependency: transitive
     description: flutter
@@ -199,7 +199,14 @@ packages:
       name: flutter_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1"
+    version: "0.7.1"
+  flutter_shimmer:
+    dependency: "direct main"
+    description:
+      name: flutter_shimmer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.3.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -237,7 +244,7 @@ packages:
       name: hooks_riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1"
+    version: "0.7.1"
   http:
     dependency: transitive
     description:
@@ -405,7 +412,7 @@ packages:
       name: riverpod
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1"
+    version: "0.7.0"
   searchable_dropdown:
     dependency: "direct main"
     description:
@@ -419,7 +426,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.8"
+    version: "0.5.10"
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -473,7 +480,7 @@ packages:
       name: state_notifier
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0"
+    version: "0.6.0"
   stream_channel:
     dependency: transitive
     description:
