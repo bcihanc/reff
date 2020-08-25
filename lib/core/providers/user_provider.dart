@@ -15,11 +15,19 @@ class UserState extends StateNotifier<UserModel> {
             age: 32,
             gender: Gender.MALE,
             city: CityModel(
-                countryCode: "tr", name: "İstanbul", utc: 3, langCode: "tr"),
-            timeStamp: DateTime.now()));
+                countryCode: "tr",
+                name: "İstanbul",
+                utc: 3,
+                langCode: "tr",
+                countryName: 'Turkey'),
+            createdDate: DateTime.now().millisecondsSinceEpoch));
 
-  void initialize(UserModel user) => this.state = user;
-  UserModel get user => state;
+  static final provider = StateNotifierProvider((ref) => UserState());
+
+  void initialize(UserModel user) {
+    _logger.info('initialize $user');
+    this.state = user;
+  }
 
   Future<bool> create() async {
     _setTimeStamp();
@@ -28,6 +36,7 @@ class UserState extends StateNotifier<UserModel> {
 
     if (userID != null && reffResult) {
       _logger.info(LogMessages.created(userID));
+      this.state = await locator<BaseUserApi>().get(userID);
       return true;
     } else {
       _logger.shout(LogMessages.notCreated);
@@ -42,8 +51,6 @@ class UserState extends StateNotifier<UserModel> {
     state = state.copyWith.call(city: city);
   }
 
-  void _setTimeStamp() =>
-      state = state.copyWith.call(timeStamp: DateTime.now());
+  void _setTimeStamp() => state =
+      state.copyWith.call(createdDate: DateTime.now().millisecondsSinceEpoch);
 }
-
-final userStateProvider = StateNotifierProvider((ref) => UserState());

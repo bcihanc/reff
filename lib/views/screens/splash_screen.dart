@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/core/services/reff_shared_preferences.dart';
 import 'package:reff/core/utils/locator.dart';
 import 'package:reff/views/screens/home_screen.dart';
@@ -10,10 +11,10 @@ import 'package:reff/views/screens/register_screen.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/services/services.dart';
 
-final connectivityStreamProvider = FutureProvider<ConnectivityResult>(
+final connectivityFutureProvider = FutureProvider<ConnectivityResult>(
     (_) => Connectivity().checkConnectivity());
 
-final userFutureProvider = FutureProvider<UserModel>((_) async {
+final sharedPreferencesFutureProvider = FutureProvider<UserModel>((_) async {
   await Future.delayed(Duration(seconds: 0)); // for logo
 
   final userID = await locator<ReffSharedPreferences>().getUserID();
@@ -33,20 +34,30 @@ class SplashScreen extends HookWidget {
   Widget build(BuildContext context) {
     _logger.info("build");
 
-    final registerState = useProvider(userFutureProvider);
-    final connectivityStream = useProvider(connectivityStreamProvider);
+    final sharedPreferencesFuture =
+        useProvider(sharedPreferencesFutureProvider);
+    final connectivityFuture = useProvider(connectivityFutureProvider);
 
-    return registerState.when(
-        data: (data) =>
-            (data != null) ? HomeScreen(user: data) : RegisterScreen(),
-        loading: () => Container(color: Colors.blue),
-        error: (err, stack) => Center(child: Container(color: Colors.red)));
-  }
-}
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      connectivityFuture.whenData((result) {
+        if (result != ConnectivityResult.none) {
+          sharedPreferencesFuture.whenData(
+            (user) {
+              debugPrint('$user');
+              if (user != null) {
+                context.read(UserState.provider).initialize(user);
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()));
+              } else {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => RegisterScreen()));
+              }
+            },
+          );
+        }
+      });
+    });
 
-class ConnectionErrorWidget extends HookWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text('Connection need :/'));
+    return Center(child: Icon(Icons.info));
   }
 }

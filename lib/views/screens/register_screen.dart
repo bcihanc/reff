@@ -4,9 +4,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:reff/core/providers/user_provider.dart';
-import 'package:reff/core/utils/local_helper.dart';
 import 'package:reff/views/screens/gender_selector.dart';
-import 'package:reff/views/widgets/question_card.dart';
+import 'package:reff/views/screens/home_screen.dart';
 import 'package:reff_shared/core/models/CityModel.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
@@ -17,15 +16,16 @@ class RegisterScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     _logger.info("build");
-    final userProvider = useProvider(userStateProvider);
-    final countryCodeState = useState(getCountryFromLocale(context));
+    final countryCodeState =
+        useState(CountryModel.getCountryFromLocale(context));
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await userProvider.create();
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => (QuestionCard())));
+          await context.read(UserState.provider).create();
+
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => (HomeScreen())));
         },
         child: Icon(Icons.navigate_next),
       ),
@@ -33,32 +33,53 @@ class RegisterScreen extends HookWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            GenderSelector(
-              onChanged: (Gender gender) {
-                userProvider.setGender(gender);
-              },
+            Column(
+              children: [
+                Icon(Icons.person, size: 32),
+                Divider(color: Colors.transparent),
+                GenderSelector(
+                  onChanged: (Gender gender) {
+                    context.read(UserState.provider).setGender(gender);
+                  },
+                ),
+              ],
             ),
             Divider(),
-            AgePicker(
-              onChanged: (int age) {
-                userProvider.setAge(age);
-              },
+            Column(
+              children: [
+                Icon(Icons.cake, size: 32),
+                Divider(color: Colors.transparent),
+                AgePicker(
+                  onChanged: (int age) {
+                    context.read(UserState.provider).setAge(age);
+                  },
+                ),
+              ],
             ),
             Divider(),
-            CountryPicker(
-                initialCountry: countryCodeState.value,
-                countries: CountryModel.COUNTRIES,
-                onChanged: (CountryModel country) {
-                  countryCodeState.value = country;
-                }),
-            Divider(),
-            LocationPicker(
-              cities: getCitiesFromCountry(countryCodeState.value),
-              initialCity: countryCodeState.value.capital,
-              onChanged: (CityModel city) {
-                userProvider.setLocation(city);
-              },
-            ),
+            Column(
+              children: [
+                Icon(Icons.map, size: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CountryPicker(
+                        initialCountry: countryCodeState.value,
+                        countries: CountryModel.countries,
+                        onChanged: (CountryModel country) {
+                          countryCodeState.value = country;
+                        }),
+                    CityPicker(
+                      cities: countryCodeState.value.cities..removeAt(0),
+                      initialCity: countryCodeState.value.capital,
+                      onChanged: (CityModel city) {
+                        context.read(UserState.provider).setLocation(city);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -66,8 +87,8 @@ class RegisterScreen extends HookWidget {
   }
 }
 
-class LocationPicker extends HookWidget {
-  LocationPicker(
+class CityPicker extends HookWidget {
+  CityPicker(
       {@required this.cities,
       @required this.initialCity,
       @required this.onChanged});
@@ -79,23 +100,19 @@ class LocationPicker extends HookWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        children: [
-          SearchableDropdown<CityModel>.single(
-            value: initialCity ?? cities.first,
-            items: cities
-                .map((city) => DropdownMenuItem(
-                      child: Text(city.name),
-                      value: city,
-                    ))
-                .toList(),
-            onChanged: (value) {
-              onChanged(value);
-            },
-          ),
-          Divider(color: Colors.transparent),
-          Text('yaşıyorum')
-        ],
+      child: SearchableDropdown<CityModel>.single(
+        underline: '',
+        displayClearIcon: false,
+        value: initialCity ?? cities.first,
+        items: cities
+            .map((city) => DropdownMenuItem(
+                  child: Text(city.name),
+                  value: city,
+                ))
+            .toList(),
+        onChanged: (value) {
+          onChanged(value);
+        },
       ),
     );
   }
@@ -114,22 +131,19 @@ class CountryPicker extends HookWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        children: [
-          SearchableDropdown<CountryModel>.single(
-            value: this.initialCountry ?? countries.first,
-            items: countries
-                .map((country) => DropdownMenuItem(
-                      child: Text(country.name),
-                      value: country,
-                    ))
-                .toList(),
-            onChanged: (value) {
-              onChanged(value);
-            },
-          ),
-          Divider(color: Colors.transparent),
-        ],
+      child: SearchableDropdown<CountryModel>.single(
+        underline: '',
+        displayClearIcon: false,
+        value: this.initialCountry ?? countries.first,
+        items: countries
+            .map((country) => DropdownMenuItem(
+                  child: Text(country.name),
+                  value: country,
+                ))
+            .toList(),
+        onChanged: (value) {
+          onChanged(value);
+        },
       ),
     );
   }
@@ -144,26 +158,20 @@ class AgePicker extends HookWidget {
   Widget build(BuildContext context) {
     final _selectedValueState = useState(32);
 
-    return Column(
-      children: [
-        Container(
-            height: 70,
-            child: NumberPicker.horizontal(
-                initialValue: _selectedValueState.value,
-                haptics: true,
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  border: Border.all(color: Theme.of(context).accentColor),
-                ),
-                minValue: 18,
-                maxValue: 98,
-                onChanged: (value) {
-                  _selectedValueState.value = value;
-                  onChanged(value.toInt());
-                })),
-        Divider(color: Colors.transparent),
-        Text('yaşındayım'),
-      ],
-    );
+    return Container(
+        height: 70,
+        child: NumberPicker.horizontal(
+            initialValue: _selectedValueState.value,
+            haptics: true,
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              border: Border.all(color: Theme.of(context).accentColor),
+            ),
+            minValue: 18,
+            maxValue: 98,
+            onChanged: (value) {
+              _selectedValueState.value = value;
+              onChanged(value.toInt());
+            }));
   }
 }
