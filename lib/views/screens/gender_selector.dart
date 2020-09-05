@@ -67,9 +67,10 @@ class CustomRadio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+        elevation: 4,
         color: gender.isSelected
             ? Theme.of(context).accentColor.withOpacity(0.5)
-            : Colors.transparent,
+            : Theme.of(context).cardColor,
         child: Container(
           height: 80,
           width: 80,
@@ -81,14 +82,14 @@ class CustomRadio extends StatelessWidget {
             children: <Widget>[
               Icon(
                 gender.icon,
-                color: gender.isSelected ? Colors.white : Colors.grey,
+                color: gender.isSelected ? Colors.white : Colors.white,
                 size: 40,
               ),
               SizedBox(height: 10),
               Text(
                 gender.name,
                 style: TextStyle(
-                    color: gender.isSelected ? Colors.white : Colors.grey),
+                    color: gender.isSelected ? Colors.white : Colors.white),
               )
             ],
           ),

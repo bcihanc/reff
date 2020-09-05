@@ -14,6 +14,7 @@ import 'package:reff/core/utils/locator.dart';
 import 'package:reff/main.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/services/services.dart';
+import 'package:tuple/tuple.dart';
 
 final uiUpdater = ValueNotifier(false);
 
@@ -101,7 +102,11 @@ class QuestionList extends HookWidget {
 //                    children: List.generate(3, (index) => ProfileShimmer())),
 //                error: (err, stack) => Text('$err'));
             return StreamBuilder<List<QuestionModel>>(
-                stream: questionApi.getsByUserUnAnswered(user),
+                stream: questionApi.gets(
+                  dateTime: DateTime.now(),
+                  onlyActiveQuestions: true,
+                  cityName: user.city,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final questions = snapshot.data;
@@ -145,21 +150,20 @@ class QuestionList extends HookWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    (question?.imageUrl != null && question?.imageUrl != '')
-                        ? Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25.0),
-                              child: FadeInImage.assetNetwork(
-                                placeholder: 'assets/images/transparency.png',
-                                fit: BoxFit.cover,
-                                width: 50,
-                                height: 50,
-                                image: question?.imageUrl,
-                              ),
-                            ),
-                          )
-                        : null,
+                    if (question?.imageUrl != null && question?.imageUrl != '')
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: FadeInImage.assetNetwork(
+                            placeholder: 'assets/images/transparency.png',
+                            fit: BoxFit.cover,
+                            width: 50,
+                            height: 50,
+                            image: question?.imageUrl,
+                          ),
+                        ),
+                      ),
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(8),
@@ -220,89 +224,115 @@ class QuestionList extends HookWidget {
   }
 }
 
+final isVotedThisFutureProvider = FutureProvider.family
+    .autoDispose<bool, Tuple2<String, String>>((ref, userAndQuestion) async {
+  debugPrint('isVotedThisFutureProvider');
+  return await locator<BaseUserApi>()
+      .isVotedThisQuestion(userAndQuestion.item1, userAndQuestion.item2);
+});
+
 class OpenQuestionContainer extends HookWidget {
   const OpenQuestionContainer({@required this.question});
-
   final QuestionModel question;
 
   @override
   Widget build(BuildContext context) {
     final answerApi = locator<BaseAnswerApi>();
-    final user = useProvider(UserState.provider.state);
-
     final voteApi = locator<BaseVoteApi>();
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: FutureBuilder<List<AnswerModel>>(
-        initialData: <AnswerModel>[],
-        future: answerApi.gets(question.answers),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data.isNotEmpty) {
-            final answers = snapshot.data;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-//                if (question?.imageUrl != null && question?.imageUrl != '')
-//                  Container(
-//                    height: 200,
-//                    child: ClipRRect(
-//                      borderRadius: BorderRadius.all(Radius.circular(8)),
-//                      child: FadeInImage.assetNetwork(
-//                        placeholder: 'assets/images/transparency.png',
-//                        image: question.imageUrl,
-//                        fit: BoxFit.fill,
-//                      ),
-//                    ),
-//                  ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 18),
-                  child: Text(
-                    question.header,
-                    style: TextStyle(fontSize: 17),
-                  ),
-                ),
-                Divider(),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: answers.length,
-                  itemBuilder: (context, index) {
-                    final answer = answers[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: GestureDetector(
-                        onTap: () async {
-                          debugPrint('pick ${answer.id} ${answer.content}');
-                          final vote = VoteModel(
-                              userID: user.id,
-                              questionID: question.id,
-                              answerID: answer.id,
-                              createdDate:
-                                  DateTime.now().millisecondsSinceEpoch);
-                          await voteApi.add(vote);
-                          uiUpdater.value = !uiUpdater.value;
-                          if (Navigator.canPop(context)) Navigator.pop(context);
-                        },
-                        child: Card(
-                            color: answer.color.toColor().withOpacity(0.4),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                answer.content ?? "answer content null",
-                              ),
-                            )),
+    final user = useProvider(UserState.provider.state);
+    final isVotedThisFuture =
+        useProvider(isVotedThisFutureProvider(Tuple2(user.id, question.id)));
+
+    _showQuestion() => Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'r.e.f.f',
+              style: GoogleFonts.pacifico(),
+            ),
+          ),
+          body: FutureBuilder<List<AnswerModel>>(
+            initialData: <AnswerModel>[],
+            future: answerApi.gets(question.answers),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                final answers = snapshot.data;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (question?.imageUrl != null && question?.imageUrl != '')
+                      Container(
+                        height: 200,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          child: FadeInImage.assetNetwork(
+                            placeholder: 'assets/images/transparency.png',
+                            image: question.imageUrl,
+                            fit: BoxFit.fill,
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ],
-            );
-          } else
-            return Column(
-                children: List.generate(1, (index) => ListTileShimmer()));
-        },
-      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 18),
+                      child: Text(
+                        question.header,
+                        style: TextStyle(fontSize: 17),
+                      ),
+                    ),
+                    Divider(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: answers.length,
+                      itemBuilder: (context, index) {
+                        final answer = answers[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: GestureDetector(
+                            onTap: () async {
+                              debugPrint('pick ${answer.id} ${answer.content}');
+                              final vote = VoteModel(
+                                  userID: user.id,
+                                  questionID: question.id,
+                                  answerID: answer.id,
+                                  city: user.city,
+                                  age: user.calculatedAge,
+                                  gender: user.gender,
+                                  createdDate:
+                                      DateTime.now().millisecondsSinceEpoch);
+                              await voteApi.add(vote);
+                              uiUpdater.value = !uiUpdater.value;
+                              if (Navigator.canPop(context))
+                                Navigator.pop(context);
+                            },
+                            child: Card(
+                                color: answer.color.toColor().withOpacity(0.4),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    answer.content ?? "answer content null",
+                                  ),
+                                )),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              } else
+                return Column(
+                    children: List.generate(1, (index) => ListTileShimmer()));
+            },
+          ),
+        );
+
+    _showResultIfReady() => Text('Sonuçlar bekleniyor...');
+
+    return Scaffold(
+      body: Center(
+          child: isVotedThisFuture.maybeWhen(
+              data: (data) => data ? _showResultIfReady() : _showQuestion(),
+              orElse: () => CircularProgressIndicator())),
     );
   }
 }

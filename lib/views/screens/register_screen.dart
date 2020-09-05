@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:reff/core/providers/main_provider.dart';
 import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/views/screens/gender_selector.dart';
 import 'package:reff/views/screens/home_screen.dart';
+import 'package:reff/views/widgets/privacy_policy_dialog.dart';
 import 'package:reff_shared/core/models/CityModel.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:searchable_dropdown/searchable_dropdown.dart';
@@ -18,69 +22,97 @@ class RegisterScreen extends HookWidget {
     _logger.info("build");
     final countryCodeState =
         useState(CountryModel.getCountryFromLocale(context));
+    final cityState = useState<CityModel>(null);
+
+    final isBusy = useProvider(BusyState.provider.state);
+
+    useEffect(() {
+      countryCodeState.value.cities.removeAt(0);
+      return null;
+    }, []);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('r.e.f.f.', style: GoogleFonts.pacifico()),
+        actions: [
+          IconButton(
+              icon: Icon(MdiIcons.incognito),
+              onPressed: () {
+                showDialog(context: context, child: PrivacyPolicyDialog());
+              })
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          context.read(BusyState.provider).setBusy();
           await context.read(UserState.provider).create();
-
+          context.read(BusyState.provider).setNotBusy();
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => (HomeScreen())));
         },
-        child: Icon(Icons.navigate_next),
+        child: isBusy
+            ? CircularProgressIndicator(backgroundColor: Colors.black)
+            : Icon(Icons.navigate_next),
       ),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Column(
-              children: [
-                Icon(Icons.person, size: 32),
-                Divider(color: Colors.transparent),
-                GenderSelector(
-                  onChanged: (Gender gender) {
-                    context.read(UserState.provider).setGender(gender);
-                  },
-                ),
-              ],
-            ),
-            Divider(),
-            Column(
-              children: [
-                Icon(Icons.cake, size: 32),
-                Divider(color: Colors.transparent),
-                AgePicker(
-                  onChanged: (int age) {
-                    context.read(UserState.provider).setAge(age);
-                  },
-                ),
-              ],
-            ),
-            Divider(),
-            Column(
-              children: [
-                Icon(Icons.map, size: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CountryPicker(
-                        initialCountry: countryCodeState.value,
-                        countries: CountryModel.countries,
-                        onChanged: (CountryModel country) {
-                          countryCodeState.value = country;
-                        }),
-                    CityPicker(
-                      cities: countryCodeState.value.cities..removeAt(0),
-                      initialCity: countryCodeState.value.capital,
-                      onChanged: (CityModel city) {
-                        context.read(UserState.provider).setLocation(city);
-                      },
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Column(
+                children: [
+                  Icon(Icons.person, size: 32),
+                  Divider(color: Colors.transparent),
+                  GenderSelector(
+                    onChanged: (Gender gender) {
+                      context.read(UserState.provider).setGender(gender);
+                    },
+                  ),
+                ],
+              ),
+              Divider(height: 30),
+              Column(
+                children: [
+                  Icon(Icons.cake, size: 32),
+                  Divider(color: Colors.transparent),
+                  AgePicker(
+                    onChanged: (int age) {
+                      context.read(UserState.provider).setAge(age);
+                    },
+                  ),
+                ],
+              ),
+              Divider(height: 30),
+              Column(
+                children: [
+                  Icon(Icons.map, size: 32),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        CountryPicker(
+                            initialCountry: countryCodeState.value,
+                            countries: CountryModel.countries,
+                            onChanged: (CountryModel country) {
+                              countryCodeState.value = country;
+                            }),
+                        CityPicker(
+                          cities: countryCodeState.value.cities,
+                          initialCity:
+                              cityState.value ?? countryCodeState.value.capital,
+                          onChanged: (CityModel city) {
+                            cityState.value = city;
+                            context.read(UserState.provider).setLocation(city);
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
-            )
-          ],
+                  ),
+                  Divider(height: 50, color: Colors.transparent)
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,6 +10,8 @@ import 'package:reff/views/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   setupLogger();
   await setupLocator();
 
@@ -35,10 +38,11 @@ class MyApp extends HookWidget {
       supportedLocales: context.supportedLocales,
       locale: context.locale,
       title: 'r.e.f.f.',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
+      // theme: ThemeData(
+      //   primarySwatch: Colors.blue,
+      //   visualDensity: VisualDensity.adaptivePlatformDensity,
+      // ),
+      theme: ThemeData.dark(),
       darkTheme: ThemeData.dark(),
       home: Scaffold(body: SplashScreen()),
     );
