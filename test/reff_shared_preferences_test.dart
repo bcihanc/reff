@@ -1,9 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:reff/core/services/reff_shared_preferences.dart';
-import 'package:reff/core/utils/locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-main() {
+void main() {
   final mockData = {
     ReffSharedPreferences.userIDKey: ReffSharedPreferences.userIDValue
   };

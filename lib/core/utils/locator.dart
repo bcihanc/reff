@@ -11,6 +11,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<BaseAnswerApi>(() => AnswerFirestoreApi());
   locator.registerLazySingleton<BaseUserApi>(() => UserFirebaseApi());
   locator.registerLazySingleton<BaseVoteApi>(() => VoteFirebaseApi());
+  locator.registerLazySingleton<BaseResultApi>(() => ResultFirestoreApi());
 
 //  locator.registerLazySingleton<BaseApi>(() => FirestoreApi());
 

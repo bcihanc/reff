@@ -14,7 +14,7 @@ import 'package:reff_shared/core/services/services.dart';
 final connectivityFutureProvider = FutureProvider<ConnectivityResult>(
     (_) => Connectivity().checkConnectivity());
 
-final sharedPreferencesFutureProvider = FutureProvider<UserModel>((_) async {
+final sharedPreferencesFutureProvider = FutureProvider<UserModel>((ref) async {
   await Future.delayed(Duration(seconds: 0)); // for logo
 
   final userID = await locator<ReffSharedPreferences>().getUserID();
@@ -39,11 +39,10 @@ class SplashScreen extends HookWidget {
     final connectivityFuture = useProvider(connectivityFutureProvider);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      connectivityFuture.whenData((result) {
-        if (result != ConnectivityResult.none) {
+      connectivityFuture.whenData((connectivity) {
+        if (connectivity != ConnectivityResult.none) {
           sharedPreferencesFuture.whenData(
             (user) {
-              debugPrint('$user');
               if (user != null) {
                 context.read(UserState.provider).initialize(user);
                 Navigator.pushReplacement(context,

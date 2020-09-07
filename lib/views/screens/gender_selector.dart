@@ -21,17 +21,17 @@ class _GenderSelectorState extends State<GenderSelector> {
           name: "Erkek",
           icon: MdiIcons.genderMale,
           isSelected: true,
-          gender: Gender.MALE),
+          gender: Gender.male),
       GenderWidgetModel(
           name: "Kadın",
           icon: MdiIcons.genderFemale,
           isSelected: false,
-          gender: Gender.FEMALE),
+          gender: Gender.female),
       GenderWidgetModel(
           name: "Diğer",
           icon: MdiIcons.genderTransgender,
           isSelected: false,
-          gender: Gender.OTHERS)
+          gender: Gender.others)
     ]);
 
     return Container(
@@ -46,8 +46,10 @@ class _GenderSelectorState extends State<GenderSelector> {
               key: KeysForTesting.gendersKey[index],
               splashColor: Theme.of(context).accentColor,
               onTap: () {
-                gendersState.value
-                    .forEach((gender) => gender.isSelected = false);
+                for (final gender in gendersState.value) {
+                  gender.isSelected = false;
+                }
+
                 gendersState.value[index].isSelected = true;
                 setState(() {});
                 widget.onChanged(gendersState.value[index].gender);

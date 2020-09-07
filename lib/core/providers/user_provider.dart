@@ -1,5 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
+import 'package:reff/core/providers/main_provider.dart';
 import 'package:reff/core/services/reff_shared_preferences.dart';
 import 'package:reff/core/utils/locator.dart';
 import 'package:reff_shared/core/models/CityModel.dart';
@@ -9,11 +10,13 @@ import 'package:reff_shared/core/utils/log_messages.dart';
 import 'package:state_notifier/state_notifier.dart';
 
 class UserState extends StateNotifier<UserModel> {
-  final _logger = Logger("UserProvider");
-  UserState()
+  final ProviderReference ref;
+  final _logger = Logger('UserProvider');
+
+  UserState(this.ref)
       : super(UserModel(
             age: 32,
-            gender: Gender.MALE,
+            gender: Gender.male,
             city: CityModel(
                 countryCode: "tr",
                 name: "İstanbul",
@@ -22,24 +25,28 @@ class UserState extends StateNotifier<UserModel> {
                 countryName: 'Turkey'),
             createdDate: DateTime.now().millisecondsSinceEpoch));
 
-  static final provider = StateNotifierProvider((ref) => UserState());
+  static final provider = StateNotifierProvider((ref) => UserState(ref));
 
   void initialize(UserModel user) {
     _logger.info('initialize $user');
-    this.state = user;
+    state = user;
   }
 
   Future<bool> create() async {
+    ref.read(BusyState.provider).setBusy();
+
     _setTimeStamp();
-    final userID = await locator<BaseUserApi>().createUser(this.state);
+    final userID = await locator<BaseUserApi>().createUser(state);
     final reffResult = await locator<ReffSharedPreferences>().setUserID(userID);
 
     if (userID != null && reffResult) {
       _logger.info(LogMessages.created(userID));
-      this.state = await locator<BaseUserApi>().get(userID);
+      state = await locator<BaseUserApi>().get(userID);
+      ref.read(BusyState.provider).setNotBusy();
       return true;
     } else {
       _logger.shout(LogMessages.notCreated);
+      ref.read(BusyState.provider).setNotBusy();
       return false;
     }
   }

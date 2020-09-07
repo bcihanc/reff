@@ -11,7 +11,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff/core/services/reff_shared_preferences.dart';
 import 'package:reff/core/utils/locator.dart';
-import 'package:reff/main.dart';
+import 'package:reff/views/screens/register_screen.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/services/services.dart';
 import 'package:tuple/tuple.dart';
@@ -34,9 +34,6 @@ class QuestionList extends HookWidget {
 
     final voteApi = locator<BaseVoteApi>();
     final user = useProvider(UserState.provider.state);
-
-    final getsByUserUnAnswered =
-        useProvider(getsByUserUnAnsweredStreamProvider(user));
 
     return Scaffold(
       appBar: AppBar(
@@ -61,8 +58,8 @@ class QuestionList extends HookWidget {
               ),
               onPressed: () async {
                 await locator<ReffSharedPreferences>().clear();
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => MyApp()));
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => RegisterScreen()));
               }),
           Container(height: 10, width: 0),
           FloatingActionButton(
@@ -88,20 +85,8 @@ class QuestionList extends HookWidget {
         child: ValueListenableBuilder(
           valueListenable: uiUpdater,
           builder: (context, value, child) {
-//            return getsByUserUnAnswered.when(
-//                data: (questions) {
-//                  return ListView.builder(
-//                      itemCount: questions.length,
-//                      shrinkWrap: true,
-//                      itemBuilder: (context, index) {
-//                        final question = questions[index];
-//                        return _cardBuild(context, question);
-//                      });
-//                },
-//                loading: () => Column(
-//                    children: List.generate(3, (index) => ProfileShimmer())),
-//                error: (err, stack) => Text('$err'));
             return StreamBuilder<List<QuestionModel>>(
+                initialData: <QuestionModel>[],
                 stream: questionApi.gets(
                   dateTime: DateTime.now(),
                   onlyActiveQuestions: true,
@@ -137,7 +122,7 @@ class QuestionList extends HookWidget {
     );
   }
 
-  _closedQuestionWidget(QuestionModel question) {
+  Widget _closedQuestionWidget(QuestionModel question) {
     return Padding(
       key: Key(question.id),
       padding: const EdgeInsets.all(8.0),
@@ -192,7 +177,7 @@ class QuestionList extends HookWidget {
                             final computedTime = question.endDate
                                 .toDateTime()
                                 .difference(DateTime.now());
-                            return computedTime.inHours.toString() + " h";
+                            return "${computedTime.inHours.toString()} h";
                           }(), style: TextStyle(color: Colors.grey))
                         ],
                       ),
@@ -302,8 +287,9 @@ class OpenQuestionContainer extends HookWidget {
                                       DateTime.now().millisecondsSinceEpoch);
                               await voteApi.add(vote);
                               uiUpdater.value = !uiUpdater.value;
-                              if (Navigator.canPop(context))
+                              if (Navigator.canPop(context)) {
                                 Navigator.pop(context);
+                              }
                             },
                             child: Card(
                                 color: answer.color.toColor().withOpacity(0.4),
@@ -319,14 +305,17 @@ class OpenQuestionContainer extends HookWidget {
                     ),
                   ],
                 );
-              } else
+              } else {
                 return Column(
                     children: List.generate(1, (index) => ListTileShimmer()));
+              }
             },
           ),
         );
 
-    _showResultIfReady() => Text('Sonuçlar bekleniyor...');
+    _showResultIfReady() => Scaffold(
+        appBar: AppBar(),
+        body: SafeArea(child: ResultWidget(questionID: question.id)));
 
     return Scaffold(
       body: Center(
@@ -334,5 +323,35 @@ class OpenQuestionContainer extends HookWidget {
               data: (data) => data ? _showResultIfReady() : _showQuestion(),
               orElse: () => CircularProgressIndicator())),
     );
+  }
+}
+
+class ResultWidget extends HookWidget {
+  final String questionID;
+
+  const ResultWidget({@required this.questionID});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<ResultModel>(
+      future: locator<BaseResultApi>().getByQuestion(questionID),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final result = snapshot.data;
+          return Text(result.toString());
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+}
+
+class ResultWidgetHolder extends HookWidget {
+  const ResultWidgetHolder({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card();
   }
 }

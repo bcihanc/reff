@@ -40,7 +40,8 @@
 //    final snapshot =
 //        await firestore.collection(kCollectionQuestions).getDocuments();
 //    final questions =
-//        snapshot.documents.map((e) => QuestionModel.fromJson(e.data)).toList();
+//        snapshot.documents.map((e) =>
+//        QuestionModel.fromJson(e.data)).toList();
 //    return questions;
 //  }
 //
@@ -81,7 +82,8 @@
 //  Future<AnswerModel> getAnswerByID(String answerID) async {
 //    assert(answerID != null);
 //    final snapshot =
-//        await firestore.collection(kCollectionAnswers).document(answerID).get();
+//        await firestore.collection(kCollectionAnswers)
+//        .document(answerID).get();
 //    final model = AnswerModel.fromJson(snapshot.data);
 //    return model;
 //  }

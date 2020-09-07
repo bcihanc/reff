@@ -17,7 +17,7 @@ class MainAppBarState extends StateNotifier<AppBar> {
             title: Text(tr("title"), style: GoogleFonts.pacifico())));
 
   void loadHomeAppBar() {
-    this.state = AppBar(
+    state = AppBar(
         primary: true, title: Text(tr("title"), style: GoogleFonts.pacifico()));
   }
 }

@@ -44,11 +44,11 @@ class RegisterScreen extends HookWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          context.read(BusyState.provider).setBusy();
-          await context.read(UserState.provider).create();
-          context.read(BusyState.provider).setNotBusy();
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => (HomeScreen())));
+          final result = await context.read(UserState.provider).create();
+          if (result) {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => (HomeScreen())));
+          }
         },
         child: isBusy
             ? CircularProgressIndicator(backgroundColor: Colors.black)
@@ -64,7 +64,7 @@ class RegisterScreen extends HookWidget {
                   Icon(Icons.person, size: 32),
                   Divider(color: Colors.transparent),
                   GenderSelector(
-                    onChanged: (Gender gender) {
+                    onChanged: (gender) {
                       context.read(UserState.provider).setGender(gender);
                     },
                   ),
@@ -76,7 +76,7 @@ class RegisterScreen extends HookWidget {
                   Icon(Icons.cake, size: 32),
                   Divider(color: Colors.transparent),
                   AgePicker(
-                    onChanged: (int age) {
+                    onChanged: (age) {
                       context.read(UserState.provider).setAge(age);
                     },
                   ),
@@ -93,14 +93,14 @@ class RegisterScreen extends HookWidget {
                         CountryPicker(
                             initialCountry: countryCodeState.value,
                             countries: CountryModel.countries,
-                            onChanged: (CountryModel country) {
+                            onChanged: (country) {
                               countryCodeState.value = country;
                             }),
                         CityPicker(
                           cities: countryCodeState.value.cities,
                           initialCity:
                               cityState.value ?? countryCodeState.value.capital,
-                          onChanged: (CityModel city) {
+                          onChanged: (city) {
                             cityState.value = city;
                             context.read(UserState.provider).setLocation(city);
                           },
@@ -142,9 +142,7 @@ class CityPicker extends HookWidget {
                   value: city,
                 ))
             .toList(),
-        onChanged: (value) {
-          onChanged(value);
-        },
+        onChanged: onChanged,
       ),
     );
   }
@@ -164,19 +162,16 @@ class CountryPicker extends HookWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: SearchableDropdown<CountryModel>.single(
-        underline: '',
-        displayClearIcon: false,
-        value: this.initialCountry ?? countries.first,
-        items: countries
-            .map((country) => DropdownMenuItem(
-                  child: Text(country.name),
-                  value: country,
-                ))
-            .toList(),
-        onChanged: (value) {
-          onChanged(value);
-        },
-      ),
+          underline: '',
+          displayClearIcon: false,
+          value: initialCountry ?? countries.first,
+          items: countries
+              .map((country) => DropdownMenuItem(
+                    child: Text(country.name),
+                    value: country,
+                  ))
+              .toList(),
+          onChanged: onChanged),
     );
   }
 }
@@ -201,9 +196,9 @@ class AgePicker extends HookWidget {
             ),
             minValue: 18,
             maxValue: 98,
-            onChanged: (value) {
-              _selectedValueState.value = value;
-              onChanged(value.toInt());
+            onChanged: (age) {
+              _selectedValueState.value = age.toInt();
+              onChanged(age.toInt());
             }));
   }
 }
