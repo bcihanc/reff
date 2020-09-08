@@ -7,8 +7,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:numberpicker/numberpicker.dart';
 import 'package:reff/core/providers/main_provider.dart';
 import 'package:reff/core/providers/user_provider.dart';
-import 'package:reff/views/screens/gender_selector.dart';
 import 'package:reff/views/screens/home_screen.dart';
+import 'package:reff/views/widgets/gender_selector.dart';
 import 'package:reff/views/widgets/privacy_policy_dialog.dart';
 import 'package:reff_shared/core/models/CityModel.dart';
 import 'package:reff_shared/core/models/models.dart';
@@ -69,6 +69,10 @@ class RegisterScreen extends HookWidget {
                     },
                   ),
                 ],
+              ),
+              Divider(height: 30),
+              EducationSelectorWidget(
+                onChanged: context.read(UserState.provider).setEducation,
               ),
               Divider(height: 30),
               Column(

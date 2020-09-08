@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -17,21 +18,21 @@ class _GenderSelectorState extends State<GenderSelector> {
   @override
   Widget build(BuildContext context) {
     final gendersState = useState([
-      GenderWidgetModel(
-          name: "Erkek",
+      GenderSelectorWidgetModel(
+          name: tr("Man"),
           icon: MdiIcons.genderMale,
           isSelected: true,
-          gender: Gender.male),
-      GenderWidgetModel(
-          name: "Kadın",
+          gender: Gender.MALE),
+      GenderSelectorWidgetModel(
+          name: tr("Woman"),
           icon: MdiIcons.genderFemale,
           isSelected: false,
-          gender: Gender.female),
-      GenderWidgetModel(
-          name: "Diğer",
+          gender: Gender.FEMALE),
+      GenderSelectorWidgetModel(
+          name: tr("Others"),
           icon: MdiIcons.genderTransgender,
           isSelected: false,
-          gender: Gender.others)
+          gender: Gender.OTHERS)
     ]);
 
     return Container(
@@ -62,7 +63,7 @@ class _GenderSelectorState extends State<GenderSelector> {
 }
 
 class CustomRadio extends StatelessWidget {
-  final GenderWidgetModel gender;
+  final GenderSelectorWidgetModel gender;
 
   CustomRadio({this.gender});
 
@@ -84,14 +85,14 @@ class CustomRadio extends StatelessWidget {
             children: <Widget>[
               Icon(
                 gender.icon,
-                color: gender.isSelected ? Colors.white : Colors.white,
+                color: gender.isSelected ? Colors.white : Colors.black,
                 size: 40,
               ),
               SizedBox(height: 10),
               Text(
                 gender.name,
                 style: TextStyle(
-                    color: gender.isSelected ? Colors.white : Colors.white),
+                    color: gender.isSelected ? Colors.white : Colors.black),
               )
             ],
           ),
@@ -99,11 +100,48 @@ class CustomRadio extends StatelessWidget {
   }
 }
 
-class GenderWidgetModel {
+class GenderSelectorWidgetModel {
   String name;
   IconData icon;
   bool isSelected;
   Gender gender;
 
-  GenderWidgetModel({this.name, this.icon, this.isSelected, this.gender});
+  GenderSelectorWidgetModel(
+      {this.name, this.icon, this.isSelected, this.gender});
+}
+
+class EducationSelectorWidget extends StatefulHookWidget {
+  final ValueChanged<Education> onChanged;
+
+  EducationSelectorWidget({this.onChanged});
+
+  @override
+  _EducationSelectorWidgetState createState() =>
+      _EducationSelectorWidgetState();
+}
+
+class _EducationSelectorWidgetState extends State<EducationSelectorWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final educationState = useState(Education.BACHELOR);
+
+    return Column(
+      children: [
+        Icon(MdiIcons.license),
+        DropdownButton<Education>(
+          value: educationState.value,
+          items: Education.values.map((education) {
+            return DropdownMenuItem<Education>(
+              value: education,
+              child: Text(tr(education.toString())),
+            );
+          }).toList(),
+          onChanged: (education) {
+            widget.onChanged(education);
+            educationState.value = education;
+          },
+        ),
+      ],
+    );
+  }
 }

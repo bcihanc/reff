@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:animations/animations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_shimmer/flutter_shimmer.dart';
@@ -14,6 +15,7 @@ import 'package:reff/core/utils/locator.dart';
 import 'package:reff/views/screens/register_screen.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/services/services.dart';
+import 'package:reff_shared/core/utils/time_cast.dart';
 import 'package:tuple/tuple.dart';
 
 final uiUpdater = ValueNotifier(false);
@@ -50,14 +52,12 @@ class QuestionList extends HookWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.delete),
-                  Text(
-                    'user',
-                    style: TextStyle(fontSize: 8),
-                  )
+                  Text('user', style: TextStyle(fontSize: 8))
                 ],
               ),
               onPressed: () async {
                 await locator<ReffSharedPreferences>().clear();
+                await locator<BaseUserApi>().remove(user.id);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => RegisterScreen()));
               }),
@@ -118,11 +118,11 @@ class QuestionList extends HookWidget {
       openBuilder: (context, c) => OpenQuestionContainer(
         question: question,
       ),
-      closedBuilder: (context, c) => _closedQuestionWidget(question),
+      closedBuilder: (context, c) => _closedQuestionWidget(context, question),
     );
   }
 
-  Widget _closedQuestionWidget(QuestionModel question) {
+  Widget _closedQuestionWidget(BuildContext context, QuestionModel question) {
     return Padding(
       key: Key(question.id),
       padding: const EdgeInsets.all(8.0),
@@ -152,33 +152,33 @@ class QuestionList extends HookWidget {
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(8),
-                        child: Text(
-                          question.header,
-                        ),
+                        child: Text(question.header,
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline1),
                       ),
                     ),
                   ],
                 ),
                 Divider(),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            MdiIcons.timer,
-                            color: Colors.grey,
-                          ),
+                          Icon(MdiIcons.mapMarker, size: 18),
                           VerticalDivider(width: 4),
-                          Text(() {
-                            final computedTime = question.endDate
-                                .toDateTime()
-                                .difference(DateTime.now());
-                            return "${computedTime.inHours.toString()} h";
-                          }(), style: TextStyle(color: Colors.grey))
+                          Text(
+                            '${question.city.name}',
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .subtitle1,
+                          )
                         ],
                       ),
                     ),
@@ -187,19 +187,31 @@ class QuestionList extends HookWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            MdiIcons.mapMarker,
-                            color: Colors.grey,
-                          ),
+                          Icon(MdiIcons.timer, size: 18),
                           VerticalDivider(width: 4),
                           Text(
-                            '${question.city.name}',
-                            style: TextStyle(color: Colors.grey),
+                                () {
+                              return TimeCast.castToTranslate(
+                                  (question.endDate -
+                                      DateTime
+                                          .now()
+                                          .millisecondsSinceEpoch) ~/
+                                      (1000 * 60),
+                                  TimeCast(
+                                      now: tr("now"),
+                                      min: tr("min"),
+                                      hour: tr("hour"),
+                                      day: tr("day"),
+                                      month: tr("month")));
+                            }(),
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .subtitle1,
                           )
                         ],
                       ),
                     ),
-                    VerticalDivider()
                   ],
                 ),
               ]),
@@ -226,8 +238,8 @@ class OpenQuestionContainer extends HookWidget {
     final voteApi = locator<BaseVoteApi>();
 
     final user = useProvider(UserState.provider.state);
-    final isVotedThisFuture =
-        useProvider(isVotedThisFutureProvider(Tuple2(user.id, question.id)));
+    final isVotedThisQuestionFuture =
+    useProvider(isVotedThisFutureProvider(Tuple2(user.id, question.id)));
 
     _showQuestion() => Scaffold(
           appBar: AppBar(
@@ -247,23 +259,19 @@ class OpenQuestionContainer extends HookWidget {
                   children: [
                     if (question?.imageUrl != null && question?.imageUrl != '')
                       Container(
-                        height: 200,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/transparency.png',
-                            image: question.imageUrl,
-                            fit: BoxFit.fill,
-                          ),
+                        alignment: Alignment.center,
+                        child: FadeInImage.assetNetwork(
+                          placeholder: 'assets/images/transparency.png',
+                          image: question.imageUrl,
+                          height: 300,
+                          width: double.maxFinite,
                         ),
                       ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 18),
-                      child: Text(
-                        question.header,
-                        style: TextStyle(fontSize: 17),
-                      ),
+                      child:
+                      Text(question.header, style: TextStyle(fontSize: 17)),
                     ),
                     Divider(),
                     ListView.builder(
@@ -275,7 +283,6 @@ class OpenQuestionContainer extends HookWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: GestureDetector(
                             onTap: () async {
-                              debugPrint('pick ${answer.id} ${answer.content}');
                               final vote = VoteModel(
                                   userID: user.id,
                                   questionID: question.id,
@@ -283,8 +290,11 @@ class OpenQuestionContainer extends HookWidget {
                                   city: user.city,
                                   age: user.calculatedAge,
                                   gender: user.gender,
+                                  education: user.education,
                                   createdDate:
-                                      DateTime.now().millisecondsSinceEpoch);
+                                  DateTime
+                                      .now()
+                                      .millisecondsSinceEpoch);
                               await voteApi.add(vote);
                               uiUpdater.value = !uiUpdater.value;
                               if (Navigator.canPop(context)) {
@@ -296,7 +306,8 @@ class OpenQuestionContainer extends HookWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    answer.content ?? "answer content null",
+                                    "${answer.content}" ??
+                                        "answer content null",
                                   ),
                                 )),
                           ),
@@ -319,7 +330,7 @@ class OpenQuestionContainer extends HookWidget {
 
     return Scaffold(
       body: Center(
-          child: isVotedThisFuture.maybeWhen(
+          child: isVotedThisQuestionFuture.maybeWhen(
               data: (data) => data ? _showResultIfReady() : _showQuestion(),
               orElse: () => CircularProgressIndicator())),
     );
@@ -336,11 +347,17 @@ class ResultWidget extends HookWidget {
     return FutureBuilder<ResultModel>(
       future: locator<BaseResultApi>().getByQuestion(questionID),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.done) {
           final result = snapshot.data;
-          return Text(result.toString());
+          if (result != null) {
+            return Text(result.toString());
+          } else {
+            return Center(
+                child: Text(
+                    ' Bu soru için oy kullanmıştın, sonuçlar bekleniyor...'));
+          }
         } else {
-          return CircularProgressIndicator();
+          return LinearProgressIndicator();
         }
       },
     );

@@ -16,7 +16,8 @@ class UserState extends StateNotifier<UserModel> {
   UserState(this.ref)
       : super(UserModel(
             age: 32,
-            gender: Gender.male,
+            gender: Gender.MALE,
+            education: Education.BACHELOR,
             city: CityModel(
                 countryCode: "tr",
                 name: "İstanbul",
@@ -52,12 +53,20 @@ class UserState extends StateNotifier<UserModel> {
   }
 
   void setAge(int age) => state = state.copyWith.call(age: age);
+
+  void setEducation(Education education) =>
+      state = state.copyWith.call(education: education);
+
   void setGender(Gender gender) => state = state.copyWith.call(gender: gender);
+
   void setLocation(CityModel city) {
     _logger.info("city changes : $city");
     state = state.copyWith.call(city: city);
   }
 
-  void _setTimeStamp() => state =
-      state.copyWith.call(createdDate: DateTime.now().millisecondsSinceEpoch);
+  void _setTimeStamp() =>
+      state =
+          state.copyWith.call(createdDate: DateTime
+              .now()
+              .millisecondsSinceEpoch);
 }
