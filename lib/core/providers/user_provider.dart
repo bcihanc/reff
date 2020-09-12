@@ -10,44 +10,33 @@ import 'package:reff_shared/core/utils/log_messages.dart';
 import 'package:state_notifier/state_notifier.dart';
 
 class UserState extends StateNotifier<UserModel> {
-  final ProviderReference ref;
+  final Reader reader;
   final _logger = Logger('UserProvider');
 
-  UserState(this.ref)
-      : super(UserModel(
-            age: 32,
-            gender: Gender.MALE,
-            education: Education.BACHELOR,
-            city: CityModel(
-                countryCode: "tr",
-                name: "İstanbul",
-                utc: 3,
-                langCode: "tr",
-                countryName: 'Turkey'),
-            createdDate: DateTime.now().millisecondsSinceEpoch));
+  UserState(this.reader) : super(UserModel.initial);
 
-  static final provider = StateNotifierProvider((ref) => UserState(ref));
+  static final provider = StateNotifierProvider((ref) => UserState(ref.read));
 
-  void initialize(UserModel user) {
+  void initializeUser(UserModel user) {
     _logger.info('initialize $user');
     state = user;
   }
 
   Future<bool> create() async {
-    ref.read(BusyState.provider).setBusy();
+    reader(BusyState.provider).setBusy();
 
     _setTimeStamp();
-    final userID = await locator<BaseUserApi>().createUser(state);
+    final userID = await locator<BaseUserApi>().add(state);
     final reffResult = await locator<ReffSharedPreferences>().setUserID(userID);
 
     if (userID != null && reffResult) {
       _logger.info(LogMessages.created(userID));
       state = await locator<BaseUserApi>().get(userID);
-      ref.read(BusyState.provider).setNotBusy();
+      reader(BusyState.provider).setNotBusy();
       return true;
     } else {
       _logger.shout(LogMessages.notCreated);
-      ref.read(BusyState.provider).setNotBusy();
+      reader(BusyState.provider).setNotBusy();
       return false;
     }
   }
@@ -64,9 +53,17 @@ class UserState extends StateNotifier<UserModel> {
     state = state.copyWith.call(city: city);
   }
 
-  void _setTimeStamp() =>
-      state =
-          state.copyWith.call(createdDate: DateTime
-              .now()
-              .millisecondsSinceEpoch);
+  void _setTimeStamp() => state =
+      state.copyWith.call(createdDate: DateTime.now().millisecondsSinceEpoch);
+
+  Future<bool> deleteUser() async {
+    reader(BusyState.provider).setBusy();
+    final resultDeleteFirebase = await locator<BaseUserApi>().remove(state.id);
+    final resultDeleteSP =
+        await locator<ReffSharedPreferences>().deleteUserID();
+    state = UserModel.initial;
+    reader(BusyState.provider).setNotBusy();
+
+    return resultDeleteSP && resultDeleteFirebase;
+  }
 }

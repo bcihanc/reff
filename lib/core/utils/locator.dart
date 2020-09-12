@@ -8,12 +8,11 @@ Future<void> setupLocator() async {
   locator.registerSingleton<ReffSharedPreferences>(ReffSharedPreferences());
 
   locator.registerSingleton<BaseQuestionApi>(QuestionFirestoreApi());
+
   locator.registerLazySingleton<BaseAnswerApi>(() => AnswerFirestoreApi());
   locator.registerLazySingleton<BaseUserApi>(() => UserFirebaseApi());
   locator.registerLazySingleton<BaseVoteApi>(() => VoteFirebaseApi());
   locator.registerLazySingleton<BaseResultApi>(() => ResultFirestoreApi());
-
-//  locator.registerLazySingleton<BaseApi>(() => FirestoreApi());
 
   await locator.allReady();
 }

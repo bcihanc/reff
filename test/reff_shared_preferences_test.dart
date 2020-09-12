@@ -41,7 +41,7 @@ void main() {
     test("clean kontrol", () async {
       SharedPreferences.setMockInitialValues(mockData);
 
-      final result = await prefs.clear();
+      final result = await prefs.deleteUserID();
       expect(result, true);
     });
   });

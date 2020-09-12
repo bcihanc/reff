@@ -1,9 +1,8 @@
 name: reff
 description: reff description
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.0+7
 author: Cihan Cengiz
-
 environment:
   sdk: ">=2.7.0 <3.0.0"
 
@@ -13,22 +12,26 @@ dependencies:
   logging: ^0.11.4
   shared_preferences: ^0.5.10
   tuple: ^1.0.3
-  get_it: ^4.0.4
-  animations: ^1.1.2
+  get_it: ^5.0.0
   flutter_hooks: ^0.14.0
-  hooks_riverpod: ^0.9.1
+  hooks_riverpod: ^0.11.0
+  package_info: ^0.4.3
   state_notifier: ^0.6.0
   easy_localization: ^2.3.3
   google_fonts: ^1.1.0
   firebase_core: ^0.5.0
   cloud_firestore: ^0.14.0+2
-  material_design_icons_flutter: ^4.0.5555
-  numberpicker: ^1.2.1
+  material_design_icons_flutter: ^4.0.5655
+  flutter_inner_drawer: ^0.5.7+2
+  cached_network_image: ^2.3.2+1
   searchable_dropdown: ^1.1.3
   connectivity: ^0.4.9+2
   flutter_shimmer: ^1.3.0
-  flutter_gradient_colors: ^1.0.0
-  flutter_countdown_timer: ^1.2.0
+  animate_do: ^1.7.3
+  percent_indicator: ^2.1.6
+  badges: ^1.1.1
+  flutter_spinkit: ^4.1.2+1
+  titled_navigation_bar: ^4.1.0
   reff_shared:
     path: ../reff_shared
 

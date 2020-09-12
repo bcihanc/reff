@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:reff/core/providers/user_provider.dart';
@@ -10,73 +13,62 @@ import 'package:reff/views/screens/register_screen.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/services/services.dart';
 
-// final connectivityFutureProvider = FutureProvider<ConnectivityResult>(
-//     (_) => Connectivity().checkConnectivity());
-
-Future<ConnectivityResult> connectivityFuture() async =>
-    await Connectivity().checkConnectivity();
-
-Future<UserModel> findUserInSP() async {
-  await Future.delayed(Duration(seconds: 0)); // for logo
-
-  final userID = await locator<ReffSharedPreferences>().getUserID();
-
-  return (userID != null)
-      ? await locator<BaseUserApi>().get(userID)
-      : () {
-          debugPrint('isRegistered null');
-          return null;
-        }();
-}
-
-// final sharedPreferencesFutureProvider =
-// FutureProvider<UserModel>((ref) async {
-//   await Future.delayed(Duration(seconds: 0)); // for logo
-//
-//   final userID = await locator<ReffSharedPreferences>().getUserID();
-//
-//   return (userID != null)
-//       ? await locator<BaseUserApi>().get(userID)
-//       : () {
-//           debugPrint('isRegistered null');
-//           return null;
-//         }();
-// });
-
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
+class SplashScreen extends HookWidget {
   final _logger = Logger("SplashScreen");
-  String message = "Splash Screen";
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      final connectivity = await Connectivity().checkConnectivity();
-      if (connectivity != ConnectivityResult.none) {
-        final user = await findUserInSP();
-
-        if (user != null) {
-          context.read(UserState.provider).initialize(user);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => HomeScreen()));
-        } else {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => RegisterScreen()));
-        }
-      } else {
-        setState(() => message = "no connection");
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     _logger.info("build");
-    return Center(child: Text('$message'));
+
+    return FutureBuilder<Widget>(
+      future: _connectionAndUserCheck(context),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return snapshot.data;
+        } else {
+          return Scaffold(
+            body: Center(
+                child: Image.asset(
+              "assets/images/logo.png",
+              color: Theme.of(context).accentColor,
+              height: 100,
+            )),
+          );
+        }
+      },
+    );
+  }
+}
+
+Future<UserModel> _tyrToFindUser() async {
+  final userID = await locator<ReffSharedPreferences>().getUserID();
+
+  if (userID != null) {
+    final user = await locator<BaseUserApi>().get(userID);
+    if (user == null) {
+      await locator<ReffSharedPreferences>().deleteUserID();
+    }
+    return user;
+  } else {
+    debugPrint('isRegistered null');
+    return null;
+  }
+}
+
+Future<Widget> _connectionAndUserCheck(BuildContext context) async {
+  await Future.delayed(Duration(seconds: 0));
+
+  final connectivity = await Connectivity().checkConnectivity();
+
+  if (connectivity == ConnectivityResult.none) {
+    return Text('no connection');
+  } else {
+    final userFromFirestore = await _tyrToFindUser();
+    if (userFromFirestore != null) {
+      context.read(UserState.provider).initializeUser(userFromFirestore);
+      return HomeScreen();
+    } else {
+      return RegisterScreen();
+    }
   }
 }

@@ -33,12 +33,15 @@ class ReffSharedPreferences {
     return result;
   }
 
-  Future<bool> clear() async {
-    final result = await (await _prefs).clear();
+  Future<bool> deleteUserID() async {
+    final isContain = (await _prefs).containsKey(userIDKey);
+    if (isContain) {
+      await (await _prefs).remove(userIDKey);
+    }
 
-    result
-        ? _logger.info("prefs temizlendi")
-        : _logger.shout("prefs temizlenemedi");
-    return result;
+    isContain
+        ? _logger.info("userID temizlendi")
+        : _logger.shout("userID bulunamadım");
+    return isContain;
   }
 }

@@ -7,8 +7,10 @@ import 'package:reff_shared/core/utils/constants.dart';
 
 class GenderSelector extends StatefulHookWidget {
   final ValueChanged<Gender> onChanged;
+  final Gender initial;
 
-  GenderSelector({this.onChanged});
+  GenderSelector({@required this.initial, this.onChanged})
+      : assert(initial != null);
 
   @override
   _GenderSelectorState createState() => _GenderSelectorState();
@@ -37,7 +39,7 @@ class _GenderSelectorState extends State<GenderSelector> {
 
     return Container(
       alignment: Alignment.center,
-      height: 100,
+      height: 50,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
@@ -65,34 +67,34 @@ class _GenderSelectorState extends State<GenderSelector> {
 class CustomRadio extends StatelessWidget {
   final GenderSelectorWidgetModel gender;
 
-  CustomRadio({this.gender});
+  const CustomRadio({@required this.gender}) : assert(gender != null);
 
   @override
   Widget build(BuildContext context) {
     return Card(
         elevation: 4,
         color: gender.isSelected
-            ? Theme.of(context).accentColor.withOpacity(0.5)
+            ? Theme.of(context).accentColor
             : Theme.of(context).cardColor,
         child: Container(
-          height: 80,
-          width: 80,
           alignment: Alignment.center,
           margin: EdgeInsets.all(5.0),
-          child: Column(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Icon(
                 gender.icon,
-                color: gender.isSelected ? Colors.white : Colors.black,
-                size: 40,
+                color: gender.isSelected ? Colors.white : Colors.grey,
+                size: 24,
               ),
-              SizedBox(height: 10),
-              Text(
-                gender.name,
-                style: TextStyle(
-                    color: gender.isSelected ? Colors.white : Colors.black),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  gender.name,
+                  style: TextStyle(
+                      color: gender.isSelected ? Colors.white : Colors.grey),
+                ),
               )
             ],
           ),
@@ -111,9 +113,11 @@ class GenderSelectorWidgetModel {
 }
 
 class EducationSelectorWidget extends StatefulHookWidget {
+  final Education initial;
   final ValueChanged<Education> onChanged;
 
-  EducationSelectorWidget({this.onChanged});
+  EducationSelectorWidget({@required this.initial, this.onChanged})
+      : assert(initial != null);
 
   @override
   _EducationSelectorWidgetState createState() =>
@@ -123,25 +127,22 @@ class EducationSelectorWidget extends StatefulHookWidget {
 class _EducationSelectorWidgetState extends State<EducationSelectorWidget> {
   @override
   Widget build(BuildContext context) {
-    final educationState = useState(Education.BACHELOR);
+    final educationState = useState(widget.initial);
 
-    return Column(
-      children: [
-        Icon(MdiIcons.license),
-        DropdownButton<Education>(
-          value: educationState.value,
-          items: Education.values.map((education) {
-            return DropdownMenuItem<Education>(
-              value: education,
-              child: Text(tr(education.toString())),
-            );
-          }).toList(),
-          onChanged: (education) {
-            widget.onChanged(education);
-            educationState.value = education;
-          },
-        ),
-      ],
+    return DropdownButton<Education>(
+      value: educationState.value,
+      underline: SizedBox.shrink(),
+      items: Education.values
+          .map((education) =>
+          DropdownMenuItem<Education>(
+            value: education,
+            child: Text(tr(education.toString())),
+          ))
+          .toList(),
+      onChanged: (education) {
+        widget.onChanged(education);
+        educationState.value = education;
+      },
     );
   }
 }
