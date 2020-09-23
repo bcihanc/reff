@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info/package_info.dart';
 import 'package:reff/core/utils/debugs.dart';
@@ -10,21 +11,19 @@ enum DrawerSide { left, right }
 
 final innerDrawerStateProvider = Provider((_) => GlobalKey<InnerDrawerState>());
 
-final buildNumberFutureProvider =
-    FutureProvider((_) async => await PackageInfo.fromPlatform());
-
-class CustomInnerDrawer extends HookWidget {
-  const CustomInnerDrawer({@required this.scaffold}) : assert(scaffold != null);
+class InnerDrawerScope extends HookWidget {
+  InnerDrawerScope({@required this.scaffold}) : assert(scaffold != null);
 
   final Scaffold scaffold;
+  final _logger = Logger("InnerDrawerScope");
 
   @override
   Widget build(BuildContext context) {
-    final key = useProvider(innerDrawerStateProvider);
-    final buildNumberFuture = useProvider(buildNumberFutureProvider);
+    _logger.info("build");
+    final buildNumberFuture = useFuture(useMemoized(PackageInfo.fromPlatform));
 
     return InnerDrawer(
-        key: key,
+        key: context.read(innerDrawerStateProvider),
         scaffold: scaffold,
         onTapClose: true,
         swipe: false,
@@ -53,9 +52,7 @@ class CustomInnerDrawer extends HookWidget {
                       Divider(),
                       Text('Kare Agency'),
                       Divider(color: Colors.transparent),
-                      buildNumberFuture.maybeWhen(
-                          data: (data) => Text('build  ${data.buildNumber}'),
-                          orElse: () => SizedBox.shrink()),
+                      _buildBuildNumber(buildNumberFuture),
                     ],
                   ),
                 )
@@ -63,8 +60,11 @@ class CustomInnerDrawer extends HookWidget {
             ),
           ),
         ),
-        leftChild: Scaffold(
-          body: Column(
+        leftChild: Container(
+          color: Theme
+              .of(context)
+              .scaffoldBackgroundColor,
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -88,12 +88,23 @@ class CustomInnerDrawer extends HookWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child:
-                        Text('İşlemler sonrası uygulamayı yeniden başlatmanız'
-                            ' gerekiyor...'),
+                    Text('İşlemler sonrası uygulamayı yeniden başlatmanız'
+                        ' gerekiyor...'),
                   ))
             ],
           ),
         ));
+  }
+
+  Widget _buildBuildNumber(AsyncSnapshot<PackageInfo> snapshot) {
+    if (snapshot.hasData) {
+      final buildNumber = snapshot.data.buildNumber;
+      return Text('build  $buildNumber');
+    } else if (snapshot.hasError) {
+      return ErrorWidget("${snapshot.error}");
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 }
 

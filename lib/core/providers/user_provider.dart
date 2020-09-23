@@ -48,7 +48,7 @@ class UserState extends StateNotifier<UserModel> {
 
   void setGender(Gender gender) => state = state.copyWith.call(gender: gender);
 
-  void setLocation(CityModel city) {
+  void setCity(CityModel city) {
     _logger.info("city changes : $city");
     state = state.copyWith.call(city: city);
   }

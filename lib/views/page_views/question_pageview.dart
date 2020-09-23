@@ -54,7 +54,7 @@ Widget _buildItemForAnimatedList(
       axis: Axis.vertical,
       child: QuestionAnswersFutureBuilder(
         questionID: questionID,
-        builder: (context, data) =>
+        builder: (context, data, _) =>
             QuestionCard(question: data.item1, answers: data.item2),
       ));
 }
@@ -104,11 +104,13 @@ class QuestionPageView extends HookWidget {
 }
 
 class QuestionAnswersFutureBuilder extends HookWidget {
-  const QuestionAnswersFutureBuilder({@required this.questionID, this.builder})
+  const QuestionAnswersFutureBuilder(
+      {@required this.questionID, this.builder, this.child})
       : assert(questionID != null);
+
   final String questionID;
-  final Widget Function(BuildContext context,
-      Tuple2<QuestionModel, List<AnswerModel>> tupleData) builder;
+  final ValueWidgetBuilder<Tuple2<QuestionModel, List<AnswerModel>>> builder;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +118,7 @@ class QuestionAnswersFutureBuilder extends HookWidget {
         useProvider(questionAndAnswersFutureProvider(questionID));
 
     return questionAndAnswersFuture.maybeWhen(
-        data: (data) => builder(context, data),
+        data: (data) => builder(context, data, child),
         orElse: () => SizedBox.shrink());
   }
 }

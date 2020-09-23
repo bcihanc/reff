@@ -1,17 +1,9 @@
-import 'dart:async';
-
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
-import 'package:reff/core/providers/user_provider.dart';
-import 'package:reff/core/services/reff_shared_preferences.dart';
-import 'package:reff/core/utils/locator.dart';
+import 'package:reff/core/services/user_local_api.dart';
 import 'package:reff/views/screens/home_screen.dart';
-import 'package:reff/views/screens/register_screen.dart';
-import 'package:reff_shared/core/models/models.dart';
-import 'package:reff_shared/core/services/services.dart';
+import 'package:reff/views/screens/register_screen/register_screen.dart';
 
 class SplashScreen extends HookWidget {
   final _logger = Logger("SplashScreen");
@@ -20,55 +12,42 @@ class SplashScreen extends HookWidget {
   Widget build(BuildContext context) {
     _logger.info("build");
 
-    return FutureBuilder<Widget>(
-      future: _connectionAndUserCheck(context),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return snapshot.data;
-        } else {
-          return Scaffold(
-            body: Center(
-                child: Image.asset(
-              "assets/images/logo.png",
-              color: Theme.of(context).accentColor,
-              height: 100,
-            )),
-          );
-        }
-      },
-    );
+    final connectivityFuture = useFuture(
+        useMemoized(() => UserLocalApi.connectionAndUserCheck(context)));
+
+    return _handleUserLocalApiState(context, connectivityFuture);
   }
-}
 
-Future<UserModel> _tyrToFindUser() async {
-  final userID = await locator<ReffSharedPreferences>().getUserID();
-
-  if (userID != null) {
-    final user = await locator<BaseUserApi>().get(userID);
-    if (user == null) {
-      await locator<ReffSharedPreferences>().deleteUserID();
-    }
-    return user;
-  } else {
-    debugPrint('isRegistered null');
-    return null;
-  }
-}
-
-Future<Widget> _connectionAndUserCheck(BuildContext context) async {
-  await Future.delayed(Duration(seconds: 0));
-
-  final connectivity = await Connectivity().checkConnectivity();
-
-  if (connectivity == ConnectivityResult.none) {
-    return Text('no connection');
-  } else {
-    final userFromFirestore = await _tyrToFindUser();
-    if (userFromFirestore != null) {
-      context.read(UserState.provider).initializeUser(userFromFirestore);
-      return HomeScreen();
+  Widget _handleUserLocalApiState(
+      BuildContext context, AsyncSnapshot snapshot) {
+    if (snapshot.hasData) {
+      final state = snapshot.data;
+      switch (state) {
+        case UserLocalApiState.userFound:
+          return HomeScreen();
+        case UserLocalApiState.userNotFound:
+          return RegisterScreen();
+        case UserLocalApiState.connectivityProblem:
+          return Material(child: Center(child: Text('connection error :/')));
+        default:
+          return Material(child: Center(child: CircularProgressIndicator()));
+      }
+    } else if (snapshot.hasError) {
+      final error = snapshot.error;
+      return Material(
+        child: Center(
+          child: Text('$error'),
+        ),
+      );
     } else {
-      return RegisterScreen();
+      return Material(
+        child: Center(
+            child: Image.asset(
+          "assets/images/logo.png",
+          color: Theme.of(context).accentColor,
+          height: 100,
+        )),
+      );
     }
   }
 }

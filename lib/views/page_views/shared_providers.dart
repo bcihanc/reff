@@ -29,41 +29,40 @@ final allQuestionsIDsFutureProvider = FutureProvider<List<String>>((ref) async {
 /// zaman filtreli
 final allQuestionsIDsWithDateFilterFutureProvider =
     FutureProvider<List<String>>((ref) async {
-      final user = ref.watch(UserState.provider.state);
-      final questions = await locator<BaseQuestionApi>().gets(
-          city: user.city,
-          onlyActiveQuestions: true,
-          afterDateTime: DateTime.now());
+  final user = ref.watch(UserState.provider.state);
+  final questions = await locator<BaseQuestionApi>().gets(
+      city: user.city,
+      onlyActiveQuestions: true,
+      afterDateTime: DateTime.now());
 
-      for (final question in questions) {
-        final isContain = ref.read(questionPoolProvider).contains(question);
-        if (!isContain) {
-          ref.read(questionPoolProvider).add(question);
-        }
-      }
+  for (final question in questions) {
+    final isContain = ref.read(questionPoolProvider).contains(question);
+    if (!isContain) {
+      ref.read(questionPoolProvider).add(question);
+    }
+  }
 
-      return questions.map((question) => question.id).toList();
+  return questions.map((question) => question.id).toList();
 });
 
 final questionAndAnswersFutureProvider =
     FutureProvider.family<Tuple2<QuestionModel, List<AnswerModel>>, String>(
         (ref, questionID) async {
-          final question =
-          await ref.read(_getQuestionByIDFutureProvider(questionID).future);
-          final answers =
-          await ref.read(
-              _getAnswersByQuestionIDFutureProvider(questionID).future);
-          return Tuple2(question, answers);
-        });
+  final question =
+      await ref.read(_getQuestionByIDFutureProvider(questionID).future);
+  final answers =
+      await ref.read(_getAnswersByQuestionIDFutureProvider(questionID).future);
+  return Tuple2(question, answers);
+});
 
 final isVotedFutureProvider =
-FutureProvider.autoDispose.family<bool, String>((ref, questionID) async {
+    FutureProvider.autoDispose.family<bool, String>((ref, questionID) async {
   final user = ref.watch(UserState.provider.state);
   return await locator<BaseUserApi>().isVotedThisQuestion(user.id, questionID);
 });
 
 final isHaveResultFutureProvider =
-FutureProvider.family<bool, String>((ref, questionID) async {
+    FutureProvider.family<bool, String>((ref, questionID) async {
   return await locator<BaseResultApi>().isHaveResultByQuestionID(questionID);
 });
 

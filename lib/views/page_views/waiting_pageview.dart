@@ -55,7 +55,7 @@ class WaitingQuestionContainer extends HookWidget {
               ),
             VerticalDivider(),
             Expanded(child: Text('${question.header}')),
-            VerticalDivider(),
+            const VerticalDivider(),
             CustomBadge(
               label: TimeCast.castToTranslate(
                   (question.endDate - DateTime.now().millisecondsSinceEpoch) ~/
@@ -76,7 +76,7 @@ class WaitingQuestionContainer extends HookWidget {
   Widget build(BuildContext context) {
     return QuestionAnswersFutureBuilder(
         questionID: questionID,
-        builder: (context, data) {
+        builder: (context, data, _) {
           final question = data.item1;
           return _buildQuestionAndRemaningTime(question);
         });

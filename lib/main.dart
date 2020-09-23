@@ -11,12 +11,9 @@ import 'package:reff/views/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
   setupLogger();
+  await Firebase.initializeApp();
   await setupLocator();
-
-  // await locator<ReffSharedPreferences>().clear();
 
   runApp(
     ProviderScope(

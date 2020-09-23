@@ -48,7 +48,7 @@ class ArchivePageView extends HookWidget {
               children: questionsIDs
                   .map((questionID) => QuestionAnswersFutureBuilder(
                         questionID: questionID,
-                        builder: (context, data) {
+                        builder: (context, data, _) {
                           return QuestionAndExpandableResult(
                               question: data.item1, answers: data.item2);
                         },

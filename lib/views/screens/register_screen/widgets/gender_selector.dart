@@ -1,24 +1,23 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/all.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:reff/core/providers/user_provider.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/utils/constants.dart';
 
-class GenderSelector extends StatefulHookWidget {
-  final ValueChanged<Gender> onChanged;
-  final Gender initial;
-
-  GenderSelector({@required this.initial, this.onChanged})
-      : assert(initial != null);
+class GenderPicker extends StatefulHookWidget {
+  const GenderPicker();
 
   @override
   _GenderSelectorState createState() => _GenderSelectorState();
 }
 
-class _GenderSelectorState extends State<GenderSelector> {
+class _GenderSelectorState extends State<GenderPicker> {
   @override
   Widget build(BuildContext context) {
+    debugPrint('GenderPicker');
     final gendersState = useState([
       GenderSelectorWidgetModel(
           name: tr("Man"),
@@ -55,7 +54,9 @@ class _GenderSelectorState extends State<GenderSelector> {
 
                 gendersState.value[index].isSelected = true;
                 setState(() {});
-                widget.onChanged(gendersState.value[index].gender);
+                context
+                    .read(UserState.provider)
+                    .setGender(gendersState.value[index].gender);
               },
               child: CustomRadio(gender: gendersState.value[index]),
             );
@@ -110,39 +111,4 @@ class GenderSelectorWidgetModel {
 
   GenderSelectorWidgetModel(
       {this.name, this.icon, this.isSelected, this.gender});
-}
-
-class EducationSelectorWidget extends StatefulHookWidget {
-  final Education initial;
-  final ValueChanged<Education> onChanged;
-
-  EducationSelectorWidget({@required this.initial, this.onChanged})
-      : assert(initial != null);
-
-  @override
-  _EducationSelectorWidgetState createState() =>
-      _EducationSelectorWidgetState();
-}
-
-class _EducationSelectorWidgetState extends State<EducationSelectorWidget> {
-  @override
-  Widget build(BuildContext context) {
-    final educationState = useState(widget.initial);
-
-    return DropdownButton<Education>(
-      value: educationState.value,
-      underline: SizedBox.shrink(),
-      items: Education.values
-          .map((education) =>
-          DropdownMenuItem<Education>(
-            value: education,
-            child: Text(tr(education.toString())),
-          ))
-          .toList(),
-      onChanged: (education) {
-        widget.onChanged(education);
-        educationState.value = education;
-      },
-    );
-  }
 }

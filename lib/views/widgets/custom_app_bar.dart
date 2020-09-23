@@ -4,12 +4,11 @@ import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:hooks_riverpod/all.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:reff/core/providers/main_provider.dart';
-import 'package:reff/inner_drawer.dart';
+import 'package:reff/views/widgets/inner_drawer.dart';
 
 class CustomAppBar extends HookWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
-    final innerDrawerState = useProvider(innerDrawerStateProvider);
     final isBusy = useProvider(BusyState.provider.state);
 
     return AppBar(
@@ -37,7 +36,9 @@ class CustomAppBar extends HookWidget implements PreferredSizeWidget {
                     child: IconButton(
                         icon: Icon(MdiIcons.bug, color: Colors.red),
                         onPressed: () {
-                          innerDrawerState.currentState
+                          context
+                              .read(innerDrawerStateProvider)
+                              .currentState
                               .toggle(direction: InnerDrawerDirection.start);
                         }),
                   ),
@@ -48,7 +49,9 @@ class CustomAppBar extends HookWidget implements PreferredSizeWidget {
                           MdiIcons.dockRight,
                         ),
                         onPressed: () {
-                          innerDrawerState.currentState
+                          context
+                              .read(innerDrawerStateProvider)
+                              .currentState
                               .toggle(direction: InnerDrawerDirection.end);
                         }),
                   ),
