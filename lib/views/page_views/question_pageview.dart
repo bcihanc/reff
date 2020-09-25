@@ -62,7 +62,7 @@ Widget _buildItemForAnimatedList(
 class QuestionPageView extends HookWidget {
   QuestionPageView();
 
-  final _logger = Logger("QAFetchList");
+  final _logger = Logger("QuestionPageView");
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +72,7 @@ class QuestionPageView extends HookWidget {
     final unAnsweredQuestionIds =
         useProvider(unAnsweredQuestionIdsFutureProvider);
 
-    return unAnsweredQuestionIds.maybeWhen(
+    return unAnsweredQuestionIds.when(
         data: (questionIDs) {
           if (questionIDs.isEmpty) {
             return Center(
@@ -97,9 +97,15 @@ class QuestionPageView extends HookWidget {
                   _buildItemForAnimatedList(
                       context, questionIDsData[index], animation));
         },
-        orElse: () => Center(
+        loading: () => Center(
               child: SpinKitWave(color: Theme.of(context).accentColor),
-            ));
+            ),
+        error: (error, stack) {
+          debugPrint('$error');
+          return Center(
+            child: Text('$error'),
+          );
+        });
   }
 }
 
@@ -117,9 +123,15 @@ class QuestionAnswersFutureBuilder extends HookWidget {
     final questionAndAnswersFuture =
         useProvider(questionAndAnswersFutureProvider(questionID));
 
-    return questionAndAnswersFuture.maybeWhen(
+    return questionAndAnswersFuture.when(
         data: (data) => builder(context, data, child),
-        orElse: () => SizedBox.shrink());
+        error: (error, stack) {
+          debugPrint('$error');
+          return Center(
+            child: Text('$error'),
+          );
+        },
+        loading: () => SizedBox.shrink());
   }
 }
 

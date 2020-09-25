@@ -1,18 +1,17 @@
 name: reff
-description: reff description
-publish_to: "none"
-version: 1.0.0+7
+description: survey app
+version: 1.0.0+8
 author: Cihan Cengiz
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.9.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   logging: ^0.11.4
-  shared_preferences: ^0.5.10
+  shared_preferences: ^0.5.12
   tuple: ^1.0.3
-  get_it: ^5.0.0
+  get_it: ^5.0.1
   flutter_hooks: ^0.14.0
   hooks_riverpod: ^0.11.0
   package_info: ^0.4.3
@@ -21,15 +20,16 @@ dependencies:
   google_fonts: ^1.1.0
   firebase_core: ^0.5.0
   cloud_firestore: ^0.14.0+2
+  firebase_messaging: ^7.0.0
   material_design_icons_flutter: ^4.0.5655
   flutter_inner_drawer: ^0.5.7+2
   cached_network_image: ^2.3.2+1
   searchable_dropdown: ^1.1.3
-  connectivity: ^0.4.9+2
+  connectivity: ^0.4.9+3
   flutter_shimmer: ^1.3.0
   animate_do: ^1.7.3
-  percent_indicator: ^2.1.6
-  badges: ^1.1.1
+  percent_indicator: ^2.1.7+3
+  badges: ^1.1.3
   flutter_spinkit: ^4.1.2+1
   titled_navigation_bar: ^4.1.0
   reff_shared:
@@ -40,9 +40,15 @@ dev_dependencies:
     sdk: flutter
   cloud_firestore_mocks: ^0.5.0+1
   effective_dart: ^1.2.4
+  flutter_launcher_icons: ^0.8.0
 
 flutter:
   uses-material-design: true
   assets:
     - assets/translations/
     - assets/images/
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"

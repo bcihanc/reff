@@ -32,6 +32,7 @@ final allQuestionsIDsWithDateFilterFutureProvider =
   final user = ref.watch(UserState.provider.state);
   final questions = await locator<BaseQuestionApi>().gets(
       city: user.city,
+      limit: 10,
       onlyActiveQuestions: true,
       afterDateTime: DateTime.now());
 
@@ -67,7 +68,7 @@ final isHaveResultFutureProvider =
 });
 
 final _getQuestionByIDFutureProvider =
-FutureProvider.family<QuestionModel, String>((ref, questionID) async {
+    FutureProvider.family<QuestionModel, String>((ref, questionID) async {
   final questionPool = ref.read(questionPoolProvider);
 
   for (final question in questionPool) {

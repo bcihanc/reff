@@ -38,7 +38,7 @@ class ArchivePageView extends HookWidget {
     final finishedAndAnsweredQuestionsFuture =
         useProvider(finishedAndAnsweredAndHaveResultQuestionsFutureProvider);
 
-    return finishedAndAnsweredQuestionsFuture.maybeWhen(
+    return finishedAndAnsweredQuestionsFuture.when(
         data: (questionsIDs) {
           if (questionsIDs.isEmpty) {
             return Center(child: Text('Aktif herhangi bir sonuç yok :/'));
@@ -55,7 +55,13 @@ class ArchivePageView extends HookWidget {
                       ))
                   .toList());
         },
-        orElse: () => Center(
+        error: (error, stack) {
+          debugPrint('$error');
+          return Center(
+            child: Text('$error'),
+          );
+        },
+        loading: () => Center(
               child: SpinKitWave(color: Theme.of(context).accentColor),
             ));
   }
@@ -90,9 +96,15 @@ class QuestionAndExpandableResult extends HookWidget {
           : null,
       title: Text("${question.header}"),
       children: [
-        result.maybeWhen(
+        result.when(
             data: (result) => ResultWithAnswersInfoBox(answers, result),
-            orElse: () => SpinKitWave(color: Theme.of(context).accentColor))
+            error: (error, stack) {
+              debugPrint('$error');
+              return Center(
+                child: Text('$error'),
+              );
+            },
+            loading: () => SpinKitWave(color: Theme.of(context).accentColor))
       ],
     );
   }

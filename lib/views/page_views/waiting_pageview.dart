@@ -17,7 +17,7 @@ class WaitingPageView extends HookWidget {
   Widget build(BuildContext context) {
     final questions = useProvider(allQuestionsIDsWithDateFilterFutureProvider);
 
-    return questions.maybeWhen(
+    return questions.when(
         data: (questionsIDs) => Column(
               children: questionsIDs
                   .map((questionID) => WaitingQuestionContainer(
@@ -25,7 +25,13 @@ class WaitingPageView extends HookWidget {
                       ))
                   .toList(),
             ),
-        orElse: () =>
+        error: (error, stack) {
+          debugPrint('$error');
+          return Center(
+            child: Text('$error'),
+          );
+        },
+        loading: () =>
             Center(child: SpinKitWave(color: Theme.of(context).accentColor)));
   }
 }

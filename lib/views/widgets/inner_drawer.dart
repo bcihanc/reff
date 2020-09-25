@@ -61,9 +61,7 @@ class InnerDrawerScope extends HookWidget {
           ),
         ),
         leftChild: Container(
-          color: Theme
-              .of(context)
-              .scaffoldBackgroundColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
@@ -88,8 +86,8 @@ class InnerDrawerScope extends HookWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child:
-                    Text('İşlemler sonrası uygulamayı yeniden başlatmanız'
-                        ' gerekiyor...'),
+                        Text('İşlemler sonrası uygulamayı yeniden başlatmanız'
+                            ' gerekiyor...'),
                   ))
             ],
           ),
