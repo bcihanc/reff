@@ -27,69 +27,75 @@ class InnerDrawerScope extends HookWidget {
         scaffold: scaffold,
         onTapClose: true,
         swipe: false,
-        rightChild: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Text(''),
-                Divider(color: Colors.transparent),
-                Expanded(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: listTiles.length,
-                    itemBuilder: (context, index) {
-                      final tile = listTiles[index];
-                      return tile;
-                    },
-                    separatorBuilder: (context, index) => Divider(),
+        rightChild: Material(
+          child: SafeArea(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Divider(color: Colors.transparent),
+                  Expanded(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: listTiles.length,
+                      itemBuilder: (context, index) {
+                        final tile = listTiles[index];
+                        return tile;
+                      },
+                      separatorBuilder: (context, index) => Divider(),
+                    ),
                   ),
-                ),
-                Center(
-                  child: Column(
-                    children: [
-                      Divider(),
-                      Text('Kare Agency'),
-                      Divider(color: Colors.transparent),
-                      _buildBuildNumber(buildNumberFuture),
-                    ],
-                  ),
-                )
-              ],
+                  Center(
+                    child: Column(
+                      children: [
+                        Divider(),
+                        Text('Kare Agency'),
+                        Divider(color: Colors.transparent),
+                        _buildBuildNumber(buildNumberFuture),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
-        leftChild: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  'Debug Menu',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
-              RaisedButton.icon(
-                  onPressed: () => deleteUser(context),
-                  icon: Icon(Icons.delete),
-                  label: Text('Kullanıcıyı kaldır.')),
-              RaisedButton.icon(
-                  onPressed: () => deleteVotes(context),
-                  icon: Icon(Icons.delete),
-                  label: Text('Oyları sil.')),
-              Card(
-                  color: Theme.of(context).accentColor,
-                  child: Padding(
+        leftChild: Material(
+          child: SafeArea(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child:
-                        Text('İşlemler sonrası uygulamayı yeniden başlatmanız'
+                    child: Text(
+                      'Debug Menu',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
+                  RaisedButton.icon(
+                      onPressed: () => deleteUser(context),
+                      icon: Icon(Icons.delete),
+                      label: Text('Kullanıcıyı kaldır.')),
+                  RaisedButton.icon(
+                      onPressed: () => deleteVotes(context),
+                      icon: Icon(Icons.delete),
+                      label: Text('Oyları sil.')),
+                  Card(
+                      color: Theme.of(context).accentColor,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                            'İşlemler sonrası uygulamayı yeniden başlatmanız'
                             ' gerekiyor...'),
-                  ))
-            ],
+                      ))
+                ],
+              ),
+            ),
           ),
         ));
   }

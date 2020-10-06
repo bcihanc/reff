@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -5,6 +7,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:future_button/future_button.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -18,6 +21,7 @@ import 'package:reff_shared/core/utils/time_cast.dart';
 import 'package:tuple/tuple.dart';
 
 final questionIDsData = <String>[];
+final emptyListProvider = StateProvider<bool>((_) => false);
 
 final unAnsweredQuestionIdsFutureProvider =
     FutureProvider.autoDispose<List<String>>((ref) async {
@@ -45,10 +49,9 @@ final unAnsweredQuestionIdsFutureProvider =
 });
 
 final animatedListStateProvider =
-    Provider((_) => GlobalKey<AnimatedListState>());
+Provider((_) => GlobalKey<AnimatedListState>());
 
-Widget _buildItemForAnimatedList(
-    BuildContext context, String questionID, Animation animation) {
+Widget _buildItemForAnimatedList(BuildContext context, String questionID, Animation animation) {
   return SizeTransition(
       sizeFactor: animation,
       axis: Axis.vertical,
@@ -70,19 +73,18 @@ class QuestionPageView extends HookWidget {
 
     final animatedListState = useProvider(animatedListStateProvider);
     final unAnsweredQuestionIds =
-        useProvider(unAnsweredQuestionIdsFutureProvider);
+    useProvider(unAnsweredQuestionIdsFutureProvider);
+
+    final listIsEmpty = useProvider(emptyListProvider).state;
 
     return unAnsweredQuestionIds.when(
         data: (questionIDs) {
-          if (questionIDs.isEmpty) {
+          if (questionIDs.isEmpty || listIsEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    MdiIcons.chat,
-                    size: 64,
-                  ),
+                  Icon(MdiIcons.chat, size: 64),
                   Divider(color: Colors.transparent),
                   Text('Şu an için gündemde bir şey yok.')
                 ],
@@ -98,8 +100,8 @@ class QuestionPageView extends HookWidget {
                       context, questionIDsData[index], animation));
         },
         loading: () => Center(
-              child: SpinKitWave(color: Theme.of(context).accentColor),
-            ),
+          child: SpinKitWave(color: Theme.of(context).accentColor),
+        ),
         error: (error, stack) {
           debugPrint('$error');
           return Center(
@@ -110,8 +112,7 @@ class QuestionPageView extends HookWidget {
 }
 
 class QuestionAnswersFutureBuilder extends HookWidget {
-  const QuestionAnswersFutureBuilder(
-      {@required this.questionID, this.builder, this.child})
+  const QuestionAnswersFutureBuilder({@required this.questionID, this.builder, this.child})
       : assert(questionID != null);
 
   final String questionID;
@@ -121,7 +122,7 @@ class QuestionAnswersFutureBuilder extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final questionAndAnswersFuture =
-        useProvider(questionAndAnswersFutureProvider(questionID));
+    useProvider(questionAndAnswersFutureProvider(questionID));
 
     return questionAndAnswersFuture.when(
         data: (data) => builder(context, data, child),
@@ -177,78 +178,92 @@ class QuestionCard extends HookWidget {
       if (isContain) {
         questionIDsData.remove(question.id);
       }
+
+      if (questionIDsData.isEmpty) {
+        context
+            .refresh(emptyListProvider)
+            .state = true;
+      }
     }
 
     return FadeIn(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Card(
-          elevation: 3,
-          shadowColor: Theme.of(context).accentColor,
+          // elevation: 3,
+          // shadowColor: Theme.of(context).accentColor,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
+                Column(
+                  // mainAxisSize: MainAxisSize.min,
                   children: [
                     if (question?.imageUrl != null && question?.imageUrl != '')
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(36.0),
+                      Stack(children: [
+                        ClipRRect(
+                          borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(4)),
                           child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            width: 36,
-                            height: 36,
                             imageUrl: question?.imageUrl,
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width,
+                            height: 150,
+                            fit: BoxFit.fitWidth,
                           ),
                         ),
-                      ),
-                    Expanded(
-                      child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(
-                            "${question.header}",
-                            style: TextStyle(fontSize: 16),
-                          )),
-                    ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CustomBadge(
+                                label: question.city.name,
+                                iconData: Icons.place,
+                              ),
+                              VerticalDivider(width: 4),
+                              CustomBadge(
+                                label: TimeCast.castToTranslate(
+                                    (question.endDate -
+                                        DateTime
+                                            .now()
+                                            .millisecondsSinceEpoch) ~/
+                                        (1000 * 60),
+                                    TimeCast(
+                                        now: tr("now"),
+                                        min: tr("min"),
+                                        hour: tr("hour"),
+                                        day: tr("day"),
+                                        month: tr("month"))),
+                                iconData: Icons.timelapse,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ]),
+                    Container(
+                        padding: const EdgeInsets.all(16) +
+                            const EdgeInsets.only(top: 8),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${question.header}",
+                          style: TextStyle(fontSize: 21),
+                        )),
                   ],
                 ),
                 Divider(
-                    indent: 8,
-                    endIndent: 8,
-                    color: Theme.of(context).accentColor),
-                AnswersList(answers: answers, onTapAnswer: _onHandleTapAnswer),
-                Divider(
-                    indent: 8,
-                    endIndent: 8,
-                    color: Theme.of(context).accentColor),
+                    indent: 32,
+                    endIndent: 32,
+                    color: Theme
+                        .of(context)
+                        .accentColor),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomBadge(
-                        label: question.city.name,
-                        iconData: Icons.place,
-                      ),
-                      VerticalDivider(width: 8),
-                      CustomBadge(
-                        label: TimeCast.castToTranslate(
-                            (question.endDate -
-                                    DateTime.now().millisecondsSinceEpoch) ~/
-                                (1000 * 60),
-                            TimeCast(
-                                now: tr("now"),
-                                min: tr("min"),
-                                hour: tr("hour"),
-                                day: tr("day"),
-                                month: tr("month"))),
-                        iconData: Icons.timelapse,
-                      ),
-                    ],
-                  ),
+                  child: AnswersList(
+                      answers: answers, onTapAnswer: _onHandleTapAnswer),
                 )
               ],
             ),
@@ -271,17 +286,17 @@ class AnswersList extends HookWidget {
     return Column(
       children: answers
           .map((answer) => AnswerInkwell(
-              color: answer.color.toColor(),
-              label: answer.content,
-              onTap: () => onTapAnswer(answer)))
+          key: Key(answer.id),
+          color: answer.color.toColor(),
+          label: answer.content,
+          onTap: () => onTapAnswer(answer)))
           .toList(),
     );
   }
 }
 
 class CustomBadge extends HookWidget {
-  const CustomBadge(
-      {this.color, @required this.label, @required this.iconData});
+  const CustomBadge({this.color, @required this.label, @required this.iconData});
 
   final Color color;
   final String label;
@@ -292,7 +307,11 @@ class CustomBadge extends HookWidget {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Badge(
-        badgeColor: color ?? Theme.of(context).cardColor,
+        badgeColor: color ?? Theme
+            .of(context)
+            .cardColor
+            .withOpacity(0.8),
+        elevation: 0,
         shape: BadgeShape.square,
         borderRadius: 6,
         toAnimate: false,
@@ -312,9 +331,13 @@ class CustomBadge extends HookWidget {
 }
 
 class AnswerInkwell extends HookWidget {
-  const AnswerInkwell({@required this.color, @required this.label, this.onTap})
+  const AnswerInkwell({@required Key key,
+    @required this.color,
+    @required this.label,
+    this.onTap})
       : assert(label != null),
-        assert(color != null);
+        assert(color != null),
+        super(key: key);
 
   final Color color;
   final String label;
@@ -322,18 +345,48 @@ class AnswerInkwell extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isBusy = useProvider(BusyState.provider.state);
+    final isTapped = useState(false);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          isTapped.value
+              ? Icon(MdiIcons.circle, color: color)
+              : Icon(MdiIcons.circleOutline, color: color),
+          Expanded(
+            child: FutureFlatButton(
+                progressIndicatorBuilder: (_) =>
+                    SpinKitWave(color: color, size: 24),
+                splashColor: color,
+                progressIndicatorLocation: ProgressIndicatorLocation.center,
+                onPressed: isBusy
+                    ? null
+                    : () async {
+                  isTapped.value = true;
+                  await onTap();
+                },
+                child: Align(
+                    alignment: Alignment.centerLeft, child: Text('$label'))),
+          ),
+        ],
+      ),
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8),
         splashColor: color,
-        onTap: onTap,
+        onTap: !isBusy ? onTap : null,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(children: [
             Icon(MdiIcons.circleOutline, color: color),
             VerticalDivider(),
-            Text('$label')
+            Expanded(child: Text('${label}'))
           ]),
         ),
       ),

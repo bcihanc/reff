@@ -81,6 +81,6 @@ final _getQuestionByIDFutureProvider =
 });
 
 final _getAnswersByQuestionIDFutureProvider =
-FutureProvider.family<List<AnswerModel>, String>((ref, questionID) async {
+    FutureProvider.family<List<AnswerModel>, String>((ref, questionID) async {
   return await locator<BaseAnswerApi>().getsByQuestion(questionID);
 });

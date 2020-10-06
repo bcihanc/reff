@@ -36,23 +36,21 @@ class _CustomPageViewState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: InnerDrawerScope(
-        scaffold: Scaffold(
-          appBar: CustomAppBar(),
-          body: PageView(
-            controller: _pageController,
-            onPageChanged: _onPageViewOnChanged,
-            children: _pages,
-          ),
-          bottomNavigationBar: TitledBottomNavigationBar(
-              currentIndex: _currentIndex,
-              activeColor: Theme.of(context).accentColor,
-              reverse: true,
-              enableShadow: true,
-              onTap: _handleNavigationBarItemOnTap,
-              items: _bottomNavigationItems(context)),
+    return InnerDrawerScope(
+      scaffold: Scaffold(
+        appBar: CustomAppBar(),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: _onPageViewOnChanged,
+          children: _pages,
         ),
+        bottomNavigationBar: TitledBottomNavigationBar(
+            currentIndex: _currentIndex,
+            activeColor: Theme.of(context).accentColor,
+            reverse: true,
+            enableShadow: true,
+            onTap: _handleNavigationBarItemOnTap,
+            items: _bottomNavigationItems(context)),
       ),
     );
   }

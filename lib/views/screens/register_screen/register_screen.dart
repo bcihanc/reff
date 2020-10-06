@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:future_button/future_button.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -81,11 +84,25 @@ class RegisterScreen extends HookWidget {
               child: Center(
                 child: Hero(
                   tag: "logo",
-                  child: Image.asset(
-                    "assets/images/logo.png",
-                    color: Theme.of(context).accentColor,
-                    height: 80,
-                    width: 160,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8) +
+                            const EdgeInsets.only(top: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Theme.of(context).accentColor,
+                        ),
+                        child: Text(
+                          'REFF.',
+                          style: GoogleFonts.spartan(
+                              letterSpacing: -4,
+                              fontSize: 52,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               )),
@@ -119,24 +136,36 @@ class RegisterScreen extends HookWidget {
                 )),
           ),
           Container(
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
             height: 50,
-            child: RaisedButton.icon(
-                icon: Icon(MdiIcons.guyFawkesMask),
-                color: Theme.of(context).accentColor,
-                label: Row(
-                  children: [
-                    const Text('Anonim olarak devam et'),
-                    const Icon(Icons.navigate_next)
-                  ],
-                ),
-                onPressed: () async {
-                  final result =
-                      await context.read(UserState.provider).create();
-                  if (result) {
-                    HomeScreen.show(context);
-                  }
-                }),
+            child: FutureRaisedButton(
+              color: Theme
+                  .of(context)
+                  .accentColor,
+              onPressed: () async {
+                final result = await context.read(UserState.provider).create();
+                if (result) {
+                  HomeScreen.show(context);
+                }
+              },
+              progressIndicatorLocation: ProgressIndicatorLocation.center,
+              progressIndicatorBuilder: (_) =>
+              const SpinKitWave(color: Colors.white, size: 32),
+              failureIndicatorBuilder: (_) =>
+              const Icon(Icons.error, color: Colors.red),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(MdiIcons.guyFawkesMask),
+                  VerticalDivider(width: 4),
+                  const Text('Anonim olarak devam et'),
+                  const Icon(Icons.navigate_next)
+                ],
+              ),
+            ),
           )
         ],
       ),

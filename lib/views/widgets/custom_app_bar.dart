@@ -13,6 +13,7 @@ class CustomAppBar extends HookWidget implements PreferredSizeWidget {
 
     return AppBar(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      brightness: Theme.of(context).brightness,
       title: Hero(
         tag: "logo",
         child: Image.asset(
@@ -22,7 +23,8 @@ class CustomAppBar extends HookWidget implements PreferredSizeWidget {
           height: kToolbarHeight * 0.5,
         ),
       ),
-      leading: SizedBox.shrink(), // geri butonu gizlemek için
+      leading: SizedBox.shrink(),
+      // geri butonu gizlemek için
       flexibleSpace: Column(
         children: [
           SafeArea(

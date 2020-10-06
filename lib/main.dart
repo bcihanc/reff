@@ -39,10 +39,12 @@ class MyApp extends HookWidget {
       locale: context.locale ?? Locale("tr"),
       title: tr("title"),
       theme: ThemeData(
-          textTheme: textTheme,
-          accentColor: Colors.deepOrange,
-          iconTheme: IconThemeData(color: Colors.deepOrange),
-          scaffoldBackgroundColor: Colors.grey.shade200),
+        brightness: Brightness.light,
+        textTheme: textTheme,
+        accentColor: Colors.deepOrange,
+        iconTheme: IconThemeData(color: Colors.deepOrange),
+        // scaffoldBackgroundColor: Colors.grey.shade200
+      ),
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           textTheme: textTheme,
