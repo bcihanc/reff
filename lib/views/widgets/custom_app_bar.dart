@@ -13,7 +13,7 @@ class CustomAppBar extends HookWidget implements PreferredSizeWidget {
 
     return AppBar(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      brightness: Theme.of(context).brightness,
+      brightness: Theme.of(context).brightness,centerTitle: true,
       title: Hero(
         tag: "logo",
         child: Image.asset(

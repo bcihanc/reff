@@ -5,16 +5,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:reff/core/utils/locator.dart';
-import 'package:reff/core/utils/logger.dart';
 import 'package:reff/style.dart';
 import 'package:reff/views/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupLogger();
+  // setupLogger();
   await Firebase.initializeApp();
   await setupLocator();
-
   runApp(
     ProviderScope(
       child: EasyLocalization(
@@ -41,15 +39,14 @@ class MyApp extends HookWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         textTheme: textTheme,
-        accentColor: Colors.deepOrange,
-        iconTheme: IconThemeData(color: Colors.deepOrange),
-        // scaffoldBackgroundColor: Colors.grey.shade200
+        iconTheme: IconThemeData(color: Colors.orange),
+        accentColor: Colors.orange,
       ),
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           textTheme: textTheme,
-          iconTheme: IconThemeData(color: Colors.blueGrey),
-          accentColor: Colors.blueGrey),
+          iconTheme: IconThemeData(color: Colors.orange),
+          accentColor: Colors.orange),
       home: SplashScreen(),
     );
   }

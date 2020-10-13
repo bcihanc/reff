@@ -1,6 +1,6 @@
 name: reff
 description: survey app
-version: 1.0.0+8
+version: 1.0.0+9
 author: Cihan Cengiz
 environment:
   sdk: ">=2.9.0 <3.0.0"
@@ -18,9 +18,9 @@ dependencies:
   state_notifier: ^0.6.0
   easy_localization: ^2.3.3
   google_fonts: ^1.1.0
-  firebase_core: ^0.5.0
-  cloud_firestore: ^0.14.1+2
-  #  firebase_messaging: ^7.0.2
+  firebase_core: ^0.5.0+1
+  cloud_firestore: ^0.14.1+3
+  firebase_messaging: ^7.0.3
   material_design_icons_flutter: ^4.0.5655
   future_button: ^0.1.2
   flutter_inner_drawer: ^0.5.7+2
@@ -31,9 +31,12 @@ dependencies:
   animate_do: ^1.7.3
   percent_indicator: ^2.1.7+4
   badges: ^1.1.3
+  url_launcher: ^5.7.2
   flutter_spinkit: ^4.1.2+1
   titled_navigation_bar: ^4.1.0
-  rive: ^0.6.2
+  share: ^0.6.5+2
+  app_review: ^2.0.1
+  flutter_email_sender: ^3.0.1
   reff_shared:
     path: ../reff_shared
 

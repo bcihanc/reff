@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:logging/logging.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:reff/core/services/user_local_api.dart';
 import 'package:reff/views/screens/home_screen.dart';
 import 'package:reff/views/screens/register_screen/register_screen.dart';
@@ -42,10 +43,10 @@ class SplashScreen extends HookWidget {
     } else {
       return Material(
         child: Center(
-            child: Image.asset(
-          "assets/images/logo.png",
+            child: Icon(
+          MdiIcons.vote,
+          size: 100,
           color: Theme.of(context).accentColor,
-          height: 100,
         )),
       );
     }

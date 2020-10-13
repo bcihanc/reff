@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "572542359134",
+    "firebase_url": "https://reff-a2614.firebaseio.com",
+    "project_id": "reff-a2614",
+    "storage_bucket": "reff-a2614.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572542359134:android:9f4bb6d17e27f773fa06cf",
+        "android_client_info": {
+          "package_name": "com.kareagency.reff2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "572542359134-t59jae8r6dqr737dr07jpi8e9as7tr3l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEiA4FueD98vZmhvBob3S6Q6qUdLVLPNw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "572542359134-t59jae8r6dqr737dr07jpi8e9as7tr3l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "572542359134-5npmpnsd49so3gugo1q93la4but197p2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kareagency.reff2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

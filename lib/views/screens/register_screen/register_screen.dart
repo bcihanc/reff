@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:future_button/future_button.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -27,100 +26,64 @@ class RegisterScreen extends HookWidget {
     final countryCodeState =
         useState(CountryModel.getCountryFromLocale(context));
 
-    final _registerListTiles = [
-      ListTile(
-        dense: true,
-        leading: const Icon(MdiIcons.dramaMasks, size: 30),
-        title: const GenderPicker(),
-      ),
-      Row(
-        children: [
-          const VerticalDivider(),
-          Row(
-            children: [
-              const Icon(MdiIcons.school, size: 30),
-              const VerticalDivider(width: 30),
-              const EducationPicker()
-            ],
-          ),
-          const VerticalDivider(width: 45),
-          Row(
-            children: [
-              const Icon(MdiIcons.cakeVariant, size: 30),
-              const VerticalDivider(width: 30),
-              const AgePicker()
-            ],
-          )
-        ],
-      ),
-      ListTile(
-        leading: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Icon(MdiIcons.earth, color: Theme.of(context).accentColor),
-        ),
-        title: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              CountryPicker(
-                  initial: countryCodeState.value,
-                  countries: CountryModel.countries,
-                  onChanged: (country) => countryCodeState.value = country),
-              const VerticalDivider(width: 70),
-              const Icon(MdiIcons.map),
-              const VerticalDivider(width: 20),
-              CityPicker(cities: countryCodeState.value.cities),
-            ],
-          ),
-        ),
-      ),
-    ];
-
     return Scaffold(
       body: Column(
         children: [
           Padding(
-              padding: const EdgeInsets.all(36.0),
-              child: Center(
-                child: Hero(
-                  tag: "logo",
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8) +
-                            const EdgeInsets.only(top: 12),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Theme.of(context).accentColor,
-                        ),
-                        child: Text(
-                          'REFF.',
-                          style: GoogleFonts.spartan(
-                              letterSpacing: -4,
-                              fontSize: 52,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )),
+            padding: const EdgeInsets.all(36.0),
+            child: Icon(MdiIcons.dramaMasks, size: 96),
+          ),
+          GenderPicker(),
+          const SizedBox(height: 40),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: ListView.separated(
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    final tile = _registerListTiles[index];
-                    return tile;
-                  },
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemCount: _registerListTiles.length),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          children: [
+                            const Icon(Icons.school, size: 48),
+                            EducationPicker()
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const Icon(MdiIcons.cakeVariant, size: 48),
+                            AgePicker()
+                          ],
+                        ),
+                      ]),
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Column(
+                        children: [
+                          const Icon(MdiIcons.earth, size: 48),
+                          CountryPicker(
+                              initial: countryCodeState.value,
+                              countries: CountryModel.countries,
+                              onChanged: (country) =>
+                                  countryCodeState.value = country)
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          const Icon(MdiIcons.city, size: 48),
+                          CityPicker(cities: countryCodeState.value.cities)
+                        ],
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: 30,
             child: FlatButton(
                 onPressed: () {
                   showDialog(
@@ -136,15 +99,10 @@ class RegisterScreen extends HookWidget {
                 )),
           ),
           Container(
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            height: 50,
+            width: MediaQuery.of(context).size.width,
+            height: 40,
             child: FutureRaisedButton(
-              color: Theme
-                  .of(context)
-                  .accentColor,
+              color: Theme.of(context).accentColor,
               onPressed: () async {
                 final result = await context.read(UserState.provider).create();
                 if (result) {
@@ -153,14 +111,15 @@ class RegisterScreen extends HookWidget {
               },
               progressIndicatorLocation: ProgressIndicatorLocation.center,
               progressIndicatorBuilder: (_) =>
-              const SpinKitWave(color: Colors.white, size: 32),
+                  const SpinKitWave(color: Colors.white, size: 32),
               failureIndicatorBuilder: (_) =>
-              const Icon(Icons.error, color: Colors.red),
+                  const Icon(Icons.error, color: Colors.red),
+              disabledColor: Colors.transparent,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(MdiIcons.guyFawkesMask),
-                  VerticalDivider(width: 4),
+                  const SizedBox(width: 4),
                   const Text('Anonim olarak devam et'),
                   const Icon(Icons.navigate_next)
                 ],

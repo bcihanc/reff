@@ -79,33 +79,37 @@ class QuestionAndExpandableResult extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final result = useProvider(resultFutureProvider(question.id));
-    return ExpansionTile(
-      leading: (question?.imageUrl != null && question?.imageUrl != '')
-          ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(36.0),
-                child: CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  width: 32,
-                  height: 32,
-                  imageUrl: question?.imageUrl,
-                ),
-              ),
-            )
-          : null,
-      title: Text("${question.header}"),
-      children: [
-        result.when(
-            data: (result) => ResultWithAnswersInfoBox(answers, result),
-            error: (error, stack) {
-              debugPrint('$error');
-              return Center(
-                child: Text('$error'),
-              );
-            },
-            loading: () => SpinKitWave(color: Theme.of(context).accentColor))
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+        child: ExpansionTile(
+          leading: ClipRRect(
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(4)),
+            child: CachedNetworkImage(
+              fit: BoxFit.fitHeight,
+              imageBuilder: (_, image) => Image(
+                  height: 72, width: 72, fit: BoxFit.fitWidth, image: image),
+              imageUrl: question?.imageUrl,
+              errorWidget: (_, __, ___) => SizedBox.shrink(),
+            ),
+          ),
+          tilePadding: const EdgeInsets.all(0),
+          childrenPadding: const EdgeInsets.all(0),
+          title: Text("${question.header}"),
+          children: [
+            result.when(
+                data: (result) => ResultWithAnswersInfoBox(answers, result),
+                error: (error, stack) {
+                  debugPrint('$error');
+                  return Center(
+                    child: Text('$error'),
+                  );
+                },
+                loading: () =>
+                    SpinKitWave(color: Theme.of(context).accentColor))
+          ],
+        ),
+      ),
     );
   }
 }
@@ -129,14 +133,15 @@ class ResultWithAnswersInfoBox extends HookWidget {
       return MapEntry(key, counter);
     });
 
-    return Column(
-      children: answers.map((answer) {
-        final vote = voteMap[answer.id];
-        final allVotesCount = voteMap.values.reduce((a, b) => a + b);
-        final ratio = 100 * vote ~/ allVotesCount;
-        return Padding(
-          padding: const EdgeInsets.all(4),
-          child: Card(
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Column(
+        children: answers.map((answer) {
+          final vote = voteMap[answer.id];
+          final allVotesCount = voteMap.values.reduce((a, b) => a + b);
+          final ratio = 100 * vote ~/ allVotesCount;
+          return Padding(
+            padding: const EdgeInsets.all(4),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -146,9 +151,9 @@ class ResultWithAnswersInfoBox extends HookWidget {
                       Expanded(
                         child: Row(
                           children: [
-                            Icon(MdiIcons.circleOutline,
+                            Icon(MdiIcons.circle,
                                 color: answer.color.toColor()),
-                            VerticalDivider(),
+                            const SizedBox(width: 8),
                             Text('${answer.content}'),
                           ],
                         ),
@@ -156,7 +161,7 @@ class ResultWithAnswersInfoBox extends HookWidget {
                       Text('%$ratio')
                     ],
                   ),
-                  Divider(color: Colors.transparent),
+                  const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: ratio / 100,
                     valueColor: AlwaysStoppedAnimation(answer.color.toColor()),
@@ -164,9 +169,9 @@ class ResultWithAnswersInfoBox extends HookWidget {
                 ],
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }

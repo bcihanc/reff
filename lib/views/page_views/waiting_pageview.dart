@@ -8,9 +8,6 @@ import 'package:reff/views/page_views/question_pageview.dart';
 import 'package:reff/views/page_views/shared_providers.dart';
 import 'package:reff_shared/core/models/models.dart';
 import 'package:reff_shared/core/utils/time_cast.dart';
-/*
-Bu sayfa sonuçlanmayı bekleyen aktif tüm soruları gösteren bir listview içerir
- */
 
 class WaitingPageView extends HookWidget {
   @override
@@ -42,41 +39,40 @@ class WaitingQuestionContainer extends HookWidget {
 
   final String questionID;
 
-  Widget _buildQuestionAndRemaningTime(QuestionModel question) => Padding(
-        padding: const EdgeInsets.all(8),
-        child: Row(
-          children: [
-            if (question?.imageUrl != null && question?.imageUrl != '')
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(36.0),
-                  child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    width: 32,
-                    height: 32,
-                    imageUrl: question?.imageUrl,
-                  ),
-                ),
-              ),
-            VerticalDivider(),
-            Expanded(child: Text('${question.header}')),
-            const VerticalDivider(),
-            CustomBadge(
-              label: TimeCast.castToTranslate(
-                  (question.endDate - DateTime.now().millisecondsSinceEpoch) ~/
-                      (1000 * 60),
-                  TimeCast(
-                      now: tr("now"),
-                      min: tr("min"),
-                      hour: tr("hour"),
-                      day: tr("day"),
-                      month: tr("month"))),
-              iconData: Icons.timelapse,
-            )
-          ],
-        ),
-      );
+  Widget _buildQuestionAndRemaningTime(QuestionModel question) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+          child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(4)),
+            child: CachedNetworkImage(
+              imageBuilder: (_, image) =>
+                  Image(height: 72, width: 72, fit: BoxFit.fill, image: image),
+              imageUrl: question?.imageUrl,
+              errorWidget: (_, __, ___) => SizedBox.shrink(),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text('${question.header}')),
+          const SizedBox(width: 10),
+          CustomBadge(
+            label: TimeCast.castToTranslate(
+                (question.endDate - DateTime.now().millisecondsSinceEpoch) ~/
+                    (1000 * 60),
+                TimeCast(
+                    now: tr("now"),
+                    min: tr("min"),
+                    hour: tr("hour"),
+                    day: tr("day"),
+                    month: tr("month"))),
+            iconData: Icons.timelapse,
+          )
+        ],
+      )),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

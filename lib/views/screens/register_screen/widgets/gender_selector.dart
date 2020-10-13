@@ -17,7 +17,6 @@ class GenderPicker extends StatefulHookWidget {
 class _GenderSelectorState extends State<GenderPicker> {
   @override
   Widget build(BuildContext context) {
-    debugPrint('GenderPicker');
     final gendersState = useState([
       GenderSelectorWidgetModel(
           name: tr("Man"),
@@ -46,7 +45,7 @@ class _GenderSelectorState extends State<GenderPicker> {
           itemBuilder: (context, index) {
             return InkWell(
               key: KeysForTesting.gendersKey[index],
-              splashColor: Theme.of(context).accentColor,
+              splashColor: Colors.transparent,
               onTap: () {
                 for (final gender in gendersState.value) {
                   gender.isSelected = false;

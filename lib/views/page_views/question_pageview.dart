@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:animate_do/animate_do.dart';
 import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -49,9 +48,10 @@ final unAnsweredQuestionIdsFutureProvider =
 });
 
 final animatedListStateProvider =
-Provider((_) => GlobalKey<AnimatedListState>());
+    Provider((_) => GlobalKey<AnimatedListState>());
 
-Widget _buildItemForAnimatedList(BuildContext context, String questionID, Animation animation) {
+Widget _buildItemForAnimatedList(
+    BuildContext context, String questionID, Animation animation) {
   return SizeTransition(
       sizeFactor: animation,
       axis: Axis.vertical,
@@ -73,7 +73,7 @@ class QuestionPageView extends HookWidget {
 
     final animatedListState = useProvider(animatedListStateProvider);
     final unAnsweredQuestionIds =
-    useProvider(unAnsweredQuestionIdsFutureProvider);
+        useProvider(unAnsweredQuestionIdsFutureProvider);
 
     final listIsEmpty = useProvider(emptyListProvider).state;
 
@@ -100,8 +100,8 @@ class QuestionPageView extends HookWidget {
                       context, questionIDsData[index], animation));
         },
         loading: () => Center(
-          child: SpinKitWave(color: Theme.of(context).accentColor),
-        ),
+              child: SpinKitWave(color: Theme.of(context).accentColor),
+            ),
         error: (error, stack) {
           debugPrint('$error');
           return Center(
@@ -112,7 +112,8 @@ class QuestionPageView extends HookWidget {
 }
 
 class QuestionAnswersFutureBuilder extends HookWidget {
-  const QuestionAnswersFutureBuilder({@required this.questionID, this.builder, this.child})
+  const QuestionAnswersFutureBuilder(
+      {@required this.questionID, this.builder, this.child})
       : assert(questionID != null);
 
   final String questionID;
@@ -122,7 +123,7 @@ class QuestionAnswersFutureBuilder extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final questionAndAnswersFuture =
-    useProvider(questionAndAnswersFutureProvider(questionID));
+        useProvider(questionAndAnswersFutureProvider(questionID));
 
     return questionAndAnswersFuture.when(
         data: (data) => builder(context, data, child),
@@ -158,9 +159,7 @@ class QuestionCard extends HookWidget {
           age: user.calculatedAge,
           gender: user.gender,
           education: user.education,
-          createdDate: DateTime
-              .now()
-              .millisecondsSinceEpoch);
+          createdDate: DateTime.now().millisecondsSinceEpoch);
 
       context.read(BusyState.provider).setBusy();
 
@@ -170,7 +169,7 @@ class QuestionCard extends HookWidget {
       final indexOfRemovedIndex = questionIDsData.indexOf(question.id);
       animatedListState.currentState.removeItem(
           indexOfRemovedIndex,
-              (context, animation) =>
+          (context, animation) =>
               _buildItemForAnimatedList(context, question.id, animation),
           duration: Duration(milliseconds: 500));
 
@@ -180,93 +179,84 @@ class QuestionCard extends HookWidget {
       }
 
       if (questionIDsData.isEmpty) {
-        context
-            .refresh(emptyListProvider)
-            .state = true;
+        context.refresh(emptyListProvider).state = true;
       }
     }
 
-    return FadeIn(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          // elevation: 3,
-          // shadowColor: Theme.of(context).accentColor,
-          child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Column(
-                  // mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (question?.imageUrl != null && question?.imageUrl != '')
-                      Stack(children: [
-                        ClipRRect(
-                          borderRadius:
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        // elevation: 3,
+        // shadowColor: Theme.of(context).accentColor,
+        child: Padding(
+          padding: const EdgeInsets.all(0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                // mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(children: [
+                    ClipRRect(
+                      borderRadius:
                           BorderRadius.vertical(top: Radius.circular(4)),
-                          child: CachedNetworkImage(
-                            imageUrl: question?.imageUrl,
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
-                            height: 150,
-                            fit: BoxFit.fitWidth,
+                      child: CachedNetworkImage(
+                        imageUrl: question?.imageUrl,
+                        width: MediaQuery.of(context).size.width,
+                        imageBuilder: (_, image) => Image(
+                            height: 140, fit: BoxFit.fitWidth, image: image),
+                        errorWidget: (_, __, ___) => SizedBox.shrink(),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          CustomBadge(
+                            label: question.city.name,
+                            iconData: Icons.place,
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              CustomBadge(
-                                label: question.city.name,
-                                iconData: Icons.place,
-                              ),
-                              VerticalDivider(width: 4),
-                              CustomBadge(
-                                label: TimeCast.castToTranslate(
-                                    (question.endDate -
-                                        DateTime
-                                            .now()
+                          VerticalDivider(width: 4),
+                          CustomBadge(
+                            label: TimeCast.castToTranslate(
+                                (question.endDate -
+                                        DateTime.now()
                                             .millisecondsSinceEpoch) ~/
-                                        (1000 * 60),
-                                    TimeCast(
-                                        now: tr("now"),
-                                        min: tr("min"),
-                                        hour: tr("hour"),
-                                        day: tr("day"),
-                                        month: tr("month"))),
-                                iconData: Icons.timelapse,
-                              ),
-                            ],
+                                    (1000 * 60),
+                                TimeCast(
+                                    now: tr("now"),
+                                    min: tr("min"),
+                                    hour: tr("hour"),
+                                    day: tr("day"),
+                                    month: tr("month"))),
+                            iconData: Icons.timelapse,
                           ),
-                        ),
-                      ]),
-                    Container(
-                        padding: const EdgeInsets.all(16) +
-                            const EdgeInsets.only(top: 8),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "${question.header}",
-                          style: TextStyle(fontSize: 21),
-                        )),
-                  ],
-                ),
-                Divider(
-                    indent: 32,
-                    endIndent: 32,
-                    color: Theme
-                        .of(context)
-                        .accentColor),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AnswersList(
-                      answers: answers, onTapAnswer: _onHandleTapAnswer),
-                )
-              ],
-            ),
+                        ],
+                      ),
+                    ),
+                  ]),
+                  Container(
+                      padding: const EdgeInsets.all(16) +
+                          const EdgeInsets.only(top: 8),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "${question.header}",
+                        style: TextStyle(fontSize: 18),
+                      )),
+                ],
+              ),
+              Divider(
+                  indent: 32,
+                  endIndent: 32,
+                  height: 8,
+                  color: Theme.of(context).accentColor),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: AnswersList(
+                    answers: answers, onTapAnswer: _onHandleTapAnswer),
+              )
+            ],
           ),
         ),
       ),
@@ -286,17 +276,18 @@ class AnswersList extends HookWidget {
     return Column(
       children: answers
           .map((answer) => AnswerInkwell(
-          key: Key(answer.id),
-          color: answer.color.toColor(),
-          label: answer.content,
-          onTap: () => onTapAnswer(answer)))
+              key: Key(answer.id),
+              color: answer.color.toColor(),
+              label: answer.content,
+              onTap: () => onTapAnswer(answer)))
           .toList(),
     );
   }
 }
 
 class CustomBadge extends HookWidget {
-  const CustomBadge({this.color, @required this.label, @required this.iconData});
+  const CustomBadge(
+      {this.color, @required this.label, @required this.iconData});
 
   final Color color;
   final String label;
@@ -307,10 +298,7 @@ class CustomBadge extends HookWidget {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Badge(
-        badgeColor: color ?? Theme
-            .of(context)
-            .cardColor
-            .withOpacity(0.8),
+        badgeColor: color ?? Theme.of(context).cardColor.withOpacity(0.8),
         elevation: 0,
         shape: BadgeShape.square,
         borderRadius: 6,
@@ -320,7 +308,7 @@ class CustomBadge extends HookWidget {
           child: Row(
             children: [
               Icon(iconData, size: 14),
-              VerticalDivider(width: 4),
+              const SizedBox(width: 4),
               Text("$label", style: TextStyle(fontSize: 12)),
             ],
           ),
@@ -331,10 +319,11 @@ class CustomBadge extends HookWidget {
 }
 
 class AnswerInkwell extends HookWidget {
-  const AnswerInkwell({@required Key key,
-    @required this.color,
-    @required this.label,
-    this.onTap})
+  const AnswerInkwell(
+      {@required Key key,
+      @required this.color,
+      @required this.label,
+      this.onTap})
       : assert(label != null),
         assert(color != null),
         super(key: key);
@@ -365,9 +354,9 @@ class AnswerInkwell extends HookWidget {
                 onPressed: isBusy
                     ? null
                     : () async {
-                  isTapped.value = true;
-                  await onTap();
-                },
+                        isTapped.value = true;
+                        await onTap();
+                      },
                 child: Align(
                     alignment: Alignment.centerLeft, child: Text('$label'))),
           ),

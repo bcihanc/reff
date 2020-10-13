@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -26,6 +29,7 @@ class _CustomPageViewState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
+    _handleFirebaseMessaging();
   }
 
   @override
@@ -53,6 +57,18 @@ class _CustomPageViewState extends State<HomeScreen> {
             items: _bottomNavigationItems(context)),
       ),
     );
+  }
+
+  Future<void> _handleFirebaseMessaging() async {
+    final firebaseMessaging = FirebaseMessaging();
+
+    if (Platform.isIOS) {
+      await firebaseMessaging.requestNotificationPermissions();
+    }
+
+    await firebaseMessaging.configure();
+    final token = await firebaseMessaging.getToken();
+    debugPrint("FirebaseMessaging Token: $token");
   }
 
   final _pages = [WaitingPageView(), QuestionPageView(), ArchivePageView()];

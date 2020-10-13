@@ -26,6 +26,8 @@ class CityPicker extends HookWidget {
                   value: city,
                 ))
             .toList(),
-        onChanged: context.read(UserState.provider).setCity);
+        onChanged: (city) {
+          context.read(UserState.provider).setCity(city);
+        });
   }
 }
