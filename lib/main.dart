@@ -15,10 +15,13 @@ void main() async {
   await setupLocator();
   runApp(
     ProviderScope(
-      child: EasyLocalization(
-          child: MyApp(),
-          supportedLocales: [Locale("tr")],
-          path: "assets/translations"),
+      child: Builder(
+        builder: (context) => EasyLocalization(
+            child: MyApp(),
+            preloaderColor: Colors.transparent,
+            supportedLocales: [Locale("tr")],
+            path: "assets/translations"),
+      ),
     ),
   );
 }
@@ -31,23 +34,24 @@ class MyApp extends HookWidget {
     _logger.info("build");
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale ?? Locale("tr"),
-      title: tr("title"),
-      theme: ThemeData(
-        brightness: Brightness.light,
-        textTheme: textTheme,
-        iconTheme: IconThemeData(color: Colors.orange),
-        accentColor: Colors.orange,
-      ),
-      darkTheme: ThemeData(
-          brightness: Brightness.dark,
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: context.localizationDelegates,
+        supportedLocales: context.supportedLocales,
+        locale: context.locale ?? Locale("tr"),
+        title: tr("title"),
+        theme: ThemeData(
+          brightness: Brightness.light,
           textTheme: textTheme,
           iconTheme: IconThemeData(color: Colors.orange),
-          accentColor: Colors.orange),
-      home: SplashScreen(),
-    );
+          accentColor: Colors.orange,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            textTheme: textTheme,
+            iconTheme: IconThemeData(color: Colors.orange),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            accentColor: Colors.orange),
+        home: SplashScreen());
   }
 }

@@ -15,12 +15,14 @@ class WaitingPageView extends HookWidget {
     final questions = useProvider(allQuestionsIDsWithDateFilterFutureProvider);
 
     return questions.when(
-        data: (questionsIDs) => Column(
-              children: questionsIDs
-                  .map((questionID) => WaitingQuestionContainer(
-                        questionID: questionID,
-                      ))
-                  .toList(),
+        data: (questionsIDs) => SingleChildScrollView(
+              child: Column(
+                children: questionsIDs
+                    .map((questionID) => WaitingQuestionContainer(
+                          questionID: questionID,
+                        ))
+                    .toList(),
+              ),
             ),
         error: (error, stack) {
           debugPrint('$error');

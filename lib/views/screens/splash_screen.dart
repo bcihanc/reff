@@ -41,6 +41,7 @@ class SplashScreen extends HookWidget {
         ),
       );
     } else {
+      return Material();
       return Material(
         child: Center(
             child: Icon(
